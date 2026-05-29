@@ -49,9 +49,9 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
       date: matchDate,
       time: matchTime,
       teams: teams.map(team => ({
-        players: team.map(p => ({ id: p.id, name: p.name, skillLevel: p.skillLevel }))
+        players: team.map(p => ({ id: p.id, name: p.name, skillLevel: p.skillLevel, avatar: p.avatar }))
       })),
-      substitutes: substitutes.map(p => ({ id: p.id, name: p.name, skillLevel: p.skillLevel })),
+      substitutes: substitutes.map(p => ({ id: p.id, name: p.name, skillLevel: p.skillLevel, avatar: p.avatar })),
       status: 'pendiente',
       score: { team1: null, team2: null }
     });
