@@ -226,13 +226,21 @@ export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchSco
                   <div className="px-5 pb-5 border-t border-darkBg-border/30 bg-darkBg-card/40 grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                     
                     {/* Lista Equipo 1 */}
-                    <div className="bg-darkBg-input/10 p-3 rounded-lg border border-darkBg-border/20">
-                      <h5 className="text-xs font-bold text-gray-300 mb-2 border-b border-darkBg-border/30 pb-1.5">Equipo 1</h5>
-                      <ul className="space-y-1.5">
+                    <div className="bg-darkBg-input/10 p-3.5 rounded-lg border border-darkBg-border/20">
+                      <h5 className="text-xs font-bold text-gray-300 mb-3 border-b border-darkBg-border/30 pb-2">Equipo 1</h5>
+                      <ul className="space-y-2">
                         {match.teams[0]?.players?.map((p) => (
-                          <li key={p.id} className="text-xs text-gray-400 flex items-center justify-between">
-                            <span>{p.name}</span>
-                            <span className="text-[10px] bg-darkBg-input px-1.5 py-0.5 rounded text-neonGreen">
+                          <li key={p.id} className="text-sm text-gray-200 flex items-center justify-between p-1 hover:bg-white/5 rounded-lg transition-all">
+                            <div className="flex items-center gap-2.5">
+                              <img
+                                src={p.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(p.name)}`}
+                                alt={p.name}
+                                className="w-8 h-8 rounded-full border border-darkBg-border/50 object-cover bg-darkBg-card"
+                                onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
+                              />
+                              <span className="font-semibold">{p.name}</span>
+                            </div>
+                            <span className="text-[10px] bg-darkBg-input px-2 py-0.5 rounded-full text-neonGreen font-bold border border-darkBg-border/40">
                               {p.skillLevel}★
                             </span>
                           </li>
@@ -241,13 +249,21 @@ export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchSco
                     </div>
 
                     {/* Lista Equipo 2 */}
-                    <div className="bg-darkBg-input/10 p-3 rounded-lg border border-darkBg-border/20">
-                      <h5 className="text-xs font-bold text-gray-300 mb-2 border-b border-darkBg-border/30 pb-1.5">Equipo 2</h5>
-                      <ul className="space-y-1.5">
+                    <div className="bg-darkBg-input/10 p-3.5 rounded-lg border border-darkBg-border/20">
+                      <h5 className="text-xs font-bold text-gray-300 mb-3 border-b border-darkBg-border/30 pb-2">Equipo 2</h5>
+                      <ul className="space-y-2">
                         {match.teams[1]?.players?.map((p) => (
-                          <li key={p.id} className="text-xs text-gray-400 flex items-center justify-between">
-                            <span>{p.name}</span>
-                            <span className="text-[10px] bg-darkBg-input px-1.5 py-0.5 rounded text-neonGreen">
+                          <li key={p.id} className="text-sm text-gray-200 flex items-center justify-between p-1 hover:bg-white/5 rounded-lg transition-all">
+                            <div className="flex items-center gap-2.5">
+                              <img
+                                src={p.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(p.name)}`}
+                                alt={p.name}
+                                className="w-8 h-8 rounded-full border border-darkBg-border/50 object-cover bg-darkBg-card"
+                                onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
+                              />
+                              <span className="font-semibold">{p.name}</span>
+                            </div>
+                            <span className="text-[10px] bg-darkBg-input px-2 py-0.5 rounded-full text-neonGreen font-bold border border-darkBg-border/40">
                               {p.skillLevel}★
                             </span>
                           </li>
@@ -258,12 +274,21 @@ export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchSco
                     {/* Suplentes si existen */}
                     {match.substitutes && match.substitutes.length > 0 && (
                       <div className="md:col-span-2 bg-yellow-500/5 p-3 rounded-lg border border-yellow-500/10">
-                        <h5 className="text-xs font-bold text-yellow-400/90 mb-1.5">Suplentes ({match.substitutes.length})</h5>
-                        <div className="flex flex-wrap gap-1.5">
+                        <h5 className="text-xs font-bold text-yellow-400/90 mb-2 flex items-center gap-1">
+                          <Users className="w-3.5 h-3.5" /> Suplentes ({match.substitutes.length})
+                        </h5>
+                        <div className="flex flex-wrap gap-2">
                           {match.substitutes.map(p => (
-                            <span key={p.id} className="text-[10px] bg-darkBg-input/80 text-gray-400 px-2 py-0.5 rounded border border-darkBg-border">
-                              {p.name} ({p.skillLevel}★)
-                            </span>
+                            <div key={p.id} className="text-xs bg-darkBg-input/80 text-gray-300 px-3 py-1.5 rounded-full border border-darkBg-border flex items-center gap-2">
+                              <img
+                                src={p.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(p.name)}`}
+                                alt={p.name}
+                                className="w-5 h-5 rounded-full border border-darkBg-border/30 object-cover"
+                                onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
+                              />
+                              <span className="font-semibold">{p.name}</span>
+                              <span className="text-[10px] text-yellow-400 font-bold">({p.skillLevel}★)</span>
+                            </div>
                           ))}
                         </div>
                       </div>

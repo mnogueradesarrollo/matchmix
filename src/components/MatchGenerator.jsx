@@ -187,15 +187,23 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
                     {team.map((player) => (
                       <li
                         key={player.id}
-                        className="flex items-center justify-between py-2 px-3 bg-darkBg-input/30 rounded-lg border border-darkBg-border/20 text-sm"
+                        className="flex items-center justify-between py-2 px-3 bg-darkBg-input/30 rounded-lg border border-darkBg-border/20 text-sm hover:bg-white/5 transition-all"
                       >
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-gray-200">{player.name}</span>
-                          {player.isSpecial && (
-                            <span className="text-[9px] bg-neonGreen/10 text-neonGreen font-semibold px-1 rounded border border-neonGreen/20 flex items-center gap-0.5">
-                              <Shield className="w-2 h-2" /> {sport.specialPositions[0]?.toUpperCase()}
-                            </span>
-                          )}
+                        <div className="flex items-center gap-2.5">
+                          <img
+                            src={player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`}
+                            alt={player.name}
+                            className="w-8 h-8 rounded-full border border-darkBg-border/50 object-cover bg-darkBg-card"
+                            onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
+                          />
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-gray-200">{player.name}</span>
+                            {player.isSpecial && (
+                              <span className="text-[8px] bg-neonGreen/10 text-neonGreen font-semibold px-1 rounded border border-neonGreen/20 flex items-center gap-0.5 w-fit mt-0.5 uppercase">
+                                <Shield className="w-2 h-2" /> {sport.specialPositions[0]?.toUpperCase()}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         <div className="flex gap-0.5">
@@ -221,9 +229,15 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
                 {substitutes.map((player) => (
                   <div
                     key={player.id}
-                    className="flex items-center gap-2 py-1.5 px-3 bg-darkBg-input/60 border border-darkBg-border rounded-lg text-xs"
+                    className="flex items-center gap-2 py-1 px-2.5 bg-darkBg-input/60 border border-darkBg-border rounded-full text-xs font-semibold"
                   >
-                    <span className="font-medium text-gray-300">{player.name}</span>
+                    <img
+                      src={player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`}
+                      alt={player.name}
+                      className="w-5 h-5 rounded-full border border-darkBg-border/30 object-cover bg-darkBg-card"
+                      onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
+                    />
+                    <span className="text-gray-300">{player.name}</span>
                     <span className="text-yellow-400 font-bold">({player.skillLevel}★)</span>
                   </div>
                 ))}
