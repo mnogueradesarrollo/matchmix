@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Star, Plus, Shield, User, Trash2, CheckSquare, Square, Search, RefreshCw, Image, Edit2, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Star, Plus, Shield, User, Trash2, CheckSquare, Square, Search, RefreshCw, Image, Edit2, X, Upload } from 'lucide-react';
 
 export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlayer, onDeletePlayer, selectedPlayerIds, onToggleSelectPlayer, onSelectAll, onDeselectAll }) {
   const [newPlayerName, setNewPlayerName] = useState('');
@@ -12,6 +12,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
   const [hoverStar, setHoverStar] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingPlayer, setEditingPlayer] = useState(null);
+  const fileInputRef = useRef(null);
 
   // Reiniciar estado si cambia de deporte
   useEffect(() => {
@@ -28,6 +29,51 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
     return `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarSeed}`;
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.onload = () => {
+        // Redimensionar la imagen a un avatar cuadrado de 150x150px
+        const canvas = document.createElement('canvas');
+        const maxDim = 150;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxDim) {
+            height *= maxDim / width;
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width *= maxDim / height;
+            height = maxDim;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convertir a Base64 optimizado (JPEG a 70% calidad)
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        setCustomAvatarUrl(compressedBase64);
+        setShowCustomAvatarInput(false); // Ocultar input de texto ya que cargamos archivo
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const triggerFileSelect = () => {
+    fileInputRef.current.click();
+  };
+
   const startEdit = (player) => {
     setEditingPlayer(player);
     setNewPlayerName(player.name);
@@ -42,7 +88,8 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
       setShowCustomAvatarInput(false);
     } else {
       setCustomAvatarUrl(player.avatar);
-      setShowCustomAvatarInput(true);
+      // Si es base64, no mostramos el input de URL
+      setShowCustomAvatarInput(!player.avatar.startsWith('data:image'));
     }
   };
 
@@ -117,33 +164,61 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
         <form onSubmit={handleSubmit} className="space-y-4">
           
           {/* Avatar Preview */}
-          <div className="flex flex-col items-center justify-center p-3 bg-darkBg-input/30 border border-darkBg-border/50 rounded-lg gap-2">
-            <div className="relative group">
+          <div className="flex flex-col items-center justify-center p-4 bg-darkBg-input/30 border border-darkBg-border/50 rounded-lg gap-3">
+            <div className="relative group cursor-pointer" onClick={triggerFileSelect} title="Haga clic para seleccionar foto de galería">
               <img
                 src={getAvatarUrl()}
                 alt="Avatar Preview"
-                className="w-16 h-16 rounded-full border-2 border-neonGreen object-cover bg-darkBg-card"
+                className="w-20 h-20 rounded-full border-2 border-neonGreen object-cover bg-darkBg-card transition-all duration-300 group-hover:scale-105 group-hover:border-white shadow-lg"
                 onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
               />
+              <div className="absolute inset-0 flex flex-col items-center justify-center rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <Upload className="w-5 h-5 text-neonGreen mb-0.5" />
+                <span className="text-[9px] text-white font-bold uppercase tracking-wider">Subir Foto</span>
+              </div>
               {!showCustomAvatarInput && (
                 <button
                   type="button"
-                  onClick={handleRandomizeAvatar}
-                  className="absolute -bottom-1 -right-1 p-1 bg-neonGreen text-darkBg rounded-full hover:scale-110 active:scale-95 transition-all shadow"
-                  title="Otro Avatar"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRandomizeAvatar();
+                  }}
+                  className="absolute -bottom-1 -right-1 p-1.5 bg-neonGreen text-darkBg rounded-full hover:scale-110 active:scale-95 transition-all shadow-md z-10"
+                  title="Generar avatar aleatorio"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
             
-            <button
-              type="button"
-              onClick={() => setShowCustomAvatarInput(!showCustomAvatarInput)}
-              className="text-[10px] text-gray-400 hover:text-neonGreen flex items-center gap-1 transition-all mt-1"
-            >
-              <Image className="w-3 h-3" /> {showCustomAvatarInput ? 'Usar Avatar Aleatorio' : 'Usar Foto Personalizada (URL)'}
-            </button>
+            {/* Controles de Carga */}
+            <div className="flex flex-col items-center gap-1">
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              
+              <button
+                type="button"
+                onClick={triggerFileSelect}
+                className="px-4 py-1.5 bg-neonGreen/10 border border-neonGreen/30 text-neonGreen hover:bg-neonGreen/20 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5"
+              >
+                <Upload className="w-3.5 h-3.5" /> Seleccionar de Galería
+              </button>
+              
+              <span className="text-[10px] text-gray-400 mt-1">O toca la foto de arriba</span>
+
+              <button
+                type="button"
+                onClick={() => setShowCustomAvatarInput(!showCustomAvatarInput)}
+                className="text-[10px] text-gray-500 hover:text-neonGreen transition-all font-semibold mt-2 underline underline-offset-2"
+              >
+                {showCustomAvatarInput ? 'Ocultar campo de URL' : 'Ingresar URL en su lugar'}
+              </button>
+            </div>
 
             {showCustomAvatarInput && (
               <input
