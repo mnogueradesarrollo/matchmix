@@ -177,16 +177,23 @@ export default function App() {
       {/* Header Banner */}
       <header className="border-b border-darkBg-border/80 bg-darkBg-card/50 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-neonGreen/10 border border-neonGreen/20 rounded-xl flex items-center justify-center text-neonGreen shadow-md shadow-neonGreen/5">
-              <Cpu className="w-5 h-5 animate-pulse" />
+          <div className="flex items-center gap-3.5">
+            {/* Custom Premium Logo */}
+            <div className="relative w-11 h-11 flex items-center justify-center">
+              <div className="absolute inset-0 bg-neonGreen/20 blur-md rounded-xl animate-pulse"></div>
+              <div className="relative w-11 h-11 bg-darkBg-card border border-neonGreen/30 rounded-xl flex items-center justify-center shadow-lg shadow-neonGreen/10 hover:border-neonGreen transition-all duration-300">
+                <svg className="w-7 h-7 text-neonGreen" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M 22 72 L 22 35 L 50 63 L 78 35 L 78 72" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="50" cy="24" r="7" fill="currentColor" />
+                </svg>
+              </div>
             </div>
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight text-white flex items-center gap-1.5">
-                MATCH<span className="text-neonGreen">MIX</span>
+              <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-1">
+                MATCH<span className="text-neonGreen drop-shadow-[0_0_10px_rgba(222,255,154,0.4)]">MIX</span>
               </h1>
-              <p className="text-[10px] text-gray-400 font-semibold tracking-widest uppercase">
-                Smart Draft & Balancing Engine
+              <p className="text-[10px] text-neonGreen/80 font-bold tracking-widest uppercase">
+                Generador y Balanceador de Equipos
               </p>
             </div>
           </div>

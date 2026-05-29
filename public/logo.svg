@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="neonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#deff9a" />
+      <stop offset="100%" stop-color="#a3e635" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <!-- Background Shape (Sleek hex or circle outline with neon glow borders) -->
+  <rect x="5" y="5" width="90" height="90" rx="24" fill="#0b0f19" stroke="url(#neonGrad)" stroke-width="2" />
+  
+  <!-- Intersecting Match/Mix Waves/M-shapes -->
+  <path d="M 22 72 L 22 35 L 50 63 L 78 35 L 78 72" fill="none" stroke="url(#neonGrad)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" />
+  
+  <!-- Sparkle/Energy nodes representing mix -->
+  <circle cx="50" cy="24" r="6" fill="#ffffff" filter="url(#glow)" />
+  <circle cx="22" cy="35" r="4.5" fill="#deff9a" />
+  <circle cx="78" cy="35" r="4.5" fill="#deff9a" />
+</svg>
