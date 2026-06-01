@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, Trophy, Trash2, Award, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Clock, Trophy, Trash2, Award, CheckCircle, ChevronDown, ChevronUp, Edit2, Users } from 'lucide-react';
 
 export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchScore, onDeleteMatch }) {
   const [editingMatchId, setEditingMatchId] = useState(null);
