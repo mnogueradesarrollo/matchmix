@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, Trophy, Trash2, Award, CheckCircle, ChevronDown, ChevronUp, Edit2, Users } from 'lucide-react';
 
-export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchScore, onDeleteMatch }) {
+export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchScore, onDeleteMatch, onViewAvatar }) {
   const [editingMatchId, setEditingMatchId] = useState(null);
   const [score1, setScore1] = useState('');
   const [score2, setScore2] = useState('');
@@ -235,7 +235,13 @@ export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchSco
                               <img
                                 src={p.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(p.name)}`}
                                 alt={p.name}
-                                className="w-8 h-8 rounded-full border border-darkBg-border/50 object-cover bg-darkBg-card"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (onViewAvatar) {
+                                    onViewAvatar(p.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(p.name)}`, p.name);
+                                  }
+                                }}
+                                className="w-8 h-8 rounded-full border border-darkBg-border/50 object-cover bg-darkBg-card cursor-zoom-in hover:scale-105 transition-all"
                                 onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                               />
                               <span className="font-semibold">{p.name}</span>
@@ -258,7 +264,13 @@ export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchSco
                               <img
                                 src={p.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(p.name)}`}
                                 alt={p.name}
-                                className="w-8 h-8 rounded-full border border-darkBg-border/50 object-cover bg-darkBg-card"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (onViewAvatar) {
+                                    onViewAvatar(p.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(p.name)}`, p.name);
+                                  }
+                                }}
+                                className="w-8 h-8 rounded-full border border-darkBg-border/50 object-cover bg-darkBg-card cursor-zoom-in hover:scale-105 transition-all"
                                 onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                               />
                               <span className="font-semibold">{p.name}</span>
@@ -283,7 +295,13 @@ export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchSco
                               <img
                                 src={p.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(p.name)}`}
                                 alt={p.name}
-                                className="w-5 h-5 rounded-full border border-darkBg-border/30 object-cover"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (onViewAvatar) {
+                                    onViewAvatar(p.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(p.name)}`, p.name);
+                                  }
+                                }}
+                                className="w-5 h-5 rounded-full border border-darkBg-border/30 object-cover cursor-zoom-in hover:scale-105 transition-all"
                                 onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                               />
                               <span className="font-semibold">{p.name}</span>

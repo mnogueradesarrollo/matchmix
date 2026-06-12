@@ -5,7 +5,7 @@ import PlayerRoster from './components/PlayerRoster';
 import MatchGenerator from './components/MatchGenerator';
 import MatchHistory from './components/MatchHistory';
 import AuthModal from './components/AuthModal';
-import { Sparkles, Trophy, Users, ShieldAlert, Cpu } from 'lucide-react';
+import { Sparkles, Trophy, Users, ShieldAlert, Cpu, X } from 'lucide-react';
 import { USE_LOCAL_MOCK, auth } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 
@@ -18,6 +18,8 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [activePhotoUrl, setActivePhotoUrl] = useState(null);
+  const [activePhotoName, setActivePhotoName] = useState('');
 
   // Escuchar estado de autenticación en Firebase
   useEffect(() => {
@@ -253,6 +255,7 @@ export default function App() {
               onSelectAll={handleSelectAll}
               onDeselectAll={handleDeselectAll}
               isAdmin={isAdmin}
+              onViewAvatar={(url, name) => { setActivePhotoUrl(url); setActivePhotoName(name); }}
             />
 
             {/* Generador de Partidos (Solo Admin) */}
@@ -261,6 +264,7 @@ export default function App() {
                 selectedPlayers={activePlayersToDraft}
                 sport={selectedSport}
                 onConfirmMatch={handleConfirmMatch}
+                onViewAvatar={(url, name) => { setActivePhotoUrl(url); setActivePhotoName(name); }}
               />
             )}
 
@@ -271,6 +275,7 @@ export default function App() {
               isAdmin={isAdmin}
               onUpdateMatchScore={handleUpdateMatchScore}
               onDeleteMatch={handleDeleteMatch}
+              onViewAvatar={(url, name) => { setActivePhotoUrl(url); setActivePhotoName(name); }}
             />
           </>
         )}
@@ -287,6 +292,35 @@ export default function App() {
         onClose={() => setShowAuthModal(false)}
         onAuthSuccess={handleAuthSuccess}
       />
+
+      {/* Visor Zoom de Foto de Perfil */}
+      {activePhotoUrl && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md cursor-pointer"
+          onClick={() => { setActivePhotoUrl(null); setActivePhotoName(''); }}
+        >
+          <div 
+            className="relative max-w-sm w-full bg-darkBg-card border border-darkBg-border/80 rounded-2xl p-4 shadow-2xl animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => { setActivePhotoUrl(null); setActivePhotoName(''); }}
+              className="absolute top-3 right-3 p-1.5 bg-black/60 hover:bg-black/80 text-gray-400 hover:text-white rounded-full transition-all border border-darkBg-border/50"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <img
+              src={activePhotoUrl}
+              alt={activePhotoName}
+              className="w-full h-auto aspect-square rounded-xl object-cover border border-darkBg-border bg-darkBg shadow-inner"
+              onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
+            />
+            <div className="mt-3 text-center">
+              <p className="text-sm font-bold text-white tracking-wide">{activePhotoName}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

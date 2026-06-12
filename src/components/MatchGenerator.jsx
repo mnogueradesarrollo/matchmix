@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Sparkles, Users, Shuffle, Shield, AlertTriangle, CheckCircle, Calendar, Clock, X } from 'lucide-react';
 import { generateBalancedTeams } from '../utils/smartDraft';
 
-export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch }) {
+export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch, onViewAvatar }) {
   const [draftMode, setDraftMode] = useState('auto'); // 'auto' | 'manual'
   const [teams, setTeams] = useState([]);
   const [substitutes, setSubstitutes] = useState([]);
@@ -237,7 +237,13 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
                       <img
                         src={player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`}
                         alt={player.name}
-                        className="w-7 h-7 rounded-full border border-darkBg-border object-cover bg-darkBg-card"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onViewAvatar) {
+                            onViewAvatar(player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`, player.name);
+                          }
+                        }}
+                        className="w-7 h-7 rounded-full border border-darkBg-border object-cover bg-darkBg-card cursor-zoom-in hover:scale-105 transition-all"
                         onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                       />
                       <span className="font-semibold text-gray-300 truncate">{player.name}</span>
@@ -305,7 +311,13 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
                             <img
                               src={player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`}
                               alt={player.name}
-                              className="w-8 h-8 rounded-full border border-darkBg-border/50 object-cover bg-darkBg-card"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (onViewAvatar) {
+                                  onViewAvatar(player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`, player.name);
+                                }
+                              }}
+                              className="w-8 h-8 rounded-full border border-darkBg-border/50 object-cover bg-darkBg-card cursor-zoom-in hover:scale-105 transition-all"
                               onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                             />
                             <div className="flex flex-col min-w-0">
@@ -357,7 +369,13 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
                     <img
                       src={player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`}
                       alt={player.name}
-                      className="w-5 h-5 rounded-full border border-darkBg-border/30 object-cover bg-darkBg-card"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onViewAvatar) {
+                          onViewAvatar(player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`, player.name);
+                        }
+                      }}
+                      className="w-5 h-5 rounded-full border border-darkBg-border/30 object-cover bg-darkBg-card cursor-zoom-in hover:scale-105 transition-all"
                       onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                     />
                     <span className="text-gray-300">{player.name}</span>
@@ -420,7 +438,13 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
                           <img
                             src={player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`}
                             alt={player.name}
-                            className="w-8 h-8 rounded-full border border-darkBg-border/50 object-cover bg-darkBg-card"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (onViewAvatar) {
+                                onViewAvatar(player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`, player.name);
+                              }
+                            }}
+                            className="w-8 h-8 rounded-full border border-darkBg-border/50 object-cover bg-darkBg-card cursor-zoom-in hover:scale-105 transition-all"
                             onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                           />
                           <div className="flex flex-col">
@@ -461,7 +485,13 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
                     <img
                       src={player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`}
                       alt={player.name}
-                      className="w-5 h-5 rounded-full border border-darkBg-border/30 object-cover bg-darkBg-card"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onViewAvatar) {
+                          onViewAvatar(player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`, player.name);
+                        }
+                      }}
+                      className="w-5 h-5 rounded-full border border-darkBg-border/30 object-cover bg-darkBg-card cursor-zoom-in hover:scale-105 transition-all"
                       onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                     />
                     <span className="text-gray-300">{player.name}</span>

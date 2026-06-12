@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Star, Plus, Shield, User, Trash2, CheckSquare, Square, Search, RefreshCw, Image, Edit2, X, Upload, Camera } from 'lucide-react';
 
-export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlayer, onDeletePlayer, selectedPlayerIds, onToggleSelectPlayer, onSelectAll, onDeselectAll, isAdmin = false }) {
+export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlayer, onDeletePlayer, selectedPlayerIds, onToggleSelectPlayer, onSelectAll, onDeselectAll, isAdmin = false, onViewAvatar }) {
   const [newPlayerName, setNewPlayerName] = useState('');
   const [skillLevel, setSkillLevel] = useState(3);
   const [isSpecial, setIsSpecial] = useState(false);
@@ -461,11 +461,16 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                       </div>
                     )}
 
-                    {/* Foto de Perfil */}
                     <img
                       src={player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`}
                       alt={player.name}
-                      className="w-10 h-10 rounded-full border border-darkBg-border object-cover bg-darkBg-card"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onViewAvatar) {
+                          onViewAvatar(player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`, player.name);
+                        }
+                      }}
+                      className="w-10 h-10 rounded-full border border-darkBg-border object-cover bg-darkBg-card cursor-zoom-in hover:scale-105 transition-all"
                       onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                     />
 
