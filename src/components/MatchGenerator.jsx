@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { Sparkles, Users, Shuffle, Shield, AlertTriangle, CheckCircle, Calendar, Clock } from 'lucide-react';
+import { Sparkles, Users, Shuffle, Shield, AlertTriangle, CheckCircle, Calendar, Clock, X } from 'lucide-react';
 import { generateBalancedTeams } from '../utils/smartDraft';
 
 export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch }) {
+  const [draftMode, setDraftMode] = useState('auto'); // 'auto' | 'manual'
   const [teams, setTeams] = useState([]);
   const [substitutes, setSubstitutes] = useState([]);
   const [teamStats, setTeamStats] = useState([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [customTeamCount, setCustomTeamCount] = useState('');
+  const [manualAssignments, setManualAssignments] = useState({}); // { playerId: teamIndex | 'sub' }
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [matchDate, setMatchDate] = useState(() => {
     const today = new Date();
@@ -18,10 +19,32 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
     return today.toTimeString().split(' ')[0].substring(0, 5);
   });
 
+  const forcedCount = customTeamCount ? parseInt(customTeamCount, 10) : null;
+  const numTeams = forcedCount || Math.max(2, Math.floor(selectedPlayers.length / sport.playersPerTeam));
+
+  // Equipos y suplentes calculados para modo manual
+  const manualTeamsList = Array.from({ length: numTeams }, (_, idx) => 
+    selectedPlayers.filter(p => manualAssignments[p.id] === idx)
+  );
+  const manualSubstitutesList = selectedPlayers.filter(p => manualAssignments[p.id] === 'sub');
+  const unassignedPlayers = selectedPlayers.filter(p => manualAssignments[p.id] === undefined);
+
+  // Estadísticas para modo manual
+  const manualStatsList = manualTeamsList.map((team, idx) => {
+    const totalSkill = team.reduce((sum, p) => sum + p.skillLevel, 0);
+    const avgSkill = team.length > 0 ? (totalSkill / team.length).toFixed(1) : 0;
+    return {
+      teamIndex: idx,
+      totalSkill,
+      avgSkill: parseFloat(avgSkill)
+    };
+  });
+
   const handleClear = () => {
     setTeams([]);
     setSubstitutes([]);
     setTeamStats([]);
+    setManualAssignments({});
   };
 
   const handleGenerate = () => {
@@ -29,9 +52,7 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
 
     setIsGenerating(true);
     
-    // Simular una pequeña animación/retardo para dar sensación de procesamiento premium
     setTimeout(() => {
-      const forcedCount = customTeamCount ? parseInt(customTeamCount, 10) : null;
       const result = generateBalancedTeams(selectedPlayers, sport.playersPerTeam, forcedCount);
       
       setTeams(result.teams || []);
@@ -41,17 +62,35 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
     }, 600);
   };
 
+  const handleAssignPlayer = (playerId, target) => {
+    setManualAssignments(prev => ({
+      ...prev,
+      [playerId]: target
+    }));
+  };
+
+  const handleRemovePlayer = (playerId) => {
+    setManualAssignments(prev => {
+      const copy = { ...prev };
+      delete copy[playerId];
+      return copy;
+    });
+  };
+
   const handleSubmitConfirm = (e) => {
     e.preventDefault();
+    const activeTeams = draftMode === 'auto' ? teams : manualTeamsList;
+    const activeSubstitutes = draftMode === 'auto' ? substitutes : manualSubstitutesList;
+
     onConfirmMatch({
       sportId: sport.id,
       sportName: sport.name,
       date: matchDate,
       time: matchTime,
-      teams: teams.map(team => ({
+      teams: activeTeams.map(team => ({
         players: team.map(p => ({ id: p.id, name: p.name, skillLevel: p.skillLevel, avatar: p.avatar }))
       })),
-      substitutes: substitutes.map(p => ({ id: p.id, name: p.name, skillLevel: p.skillLevel, avatar: p.avatar })),
+      substitutes: activeSubstitutes.map(p => ({ id: p.id, name: p.name, skillLevel: p.skillLevel, avatar: p.avatar })),
       status: 'pendiente',
       score: { team1: null, team2: null }
     });
@@ -81,15 +120,35 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
     return badges[index % badges.length];
   };
 
+  const hasResults = draftMode === 'auto' 
+    ? teams.length > 0 
+    : Object.keys(manualAssignments).length > 0;
+
   return (
     <div className="w-full max-w-4xl mx-auto px-4 mb-10">
       
       {/* Panel de Controles */}
       <div className="bg-darkBg-card border border-darkBg-border rounded-xl p-5 shadow-lg mb-6">
+        {/* Selector de modo */}
+        <div className="flex bg-darkBg-input p-1 rounded-xl border border-darkBg-border w-fit mb-4">
+          <button
+            onClick={() => { setDraftMode('auto'); handleClear(); }}
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${draftMode === 'auto' ? 'bg-neonGreen text-darkBg shadow' : 'text-gray-400 hover:text-white'}`}
+          >
+            Balanceo Automático
+          </button>
+          <button
+            onClick={() => { setDraftMode('manual'); handleClear(); }}
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${draftMode === 'manual' ? 'bg-neonGreen text-darkBg shadow' : 'text-gray-400 hover:text-white'}`}
+          >
+            Armado Manual
+          </button>
+        </div>
+
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-neonGreen" /> Panel de Draft Inteligente
+              <Sparkles className="w-5 h-5 text-neonGreen" /> {draftMode === 'auto' ? 'Panel de Draft Inteligente' : 'Armador de Equipos Manual'}
             </h3>
             <p className="text-xs text-gray-400 mt-1">
               Seleccionados: <strong className="text-neonGreen">{selectedPlayers.length}</strong> jugadores.
@@ -98,7 +157,7 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {teams.length > 0 && (
+            {hasResults && (
               <div className="flex gap-2">
                 <button
                   onClick={handleClear}
@@ -116,7 +175,7 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
             )}
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400 whitespace-nowrap">Equipos a forzar:</span>
+              <span className="text-xs text-gray-400 whitespace-nowrap">Equipos a armar:</span>
               <input
                 type="number"
                 min="2"
@@ -128,31 +187,198 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch 
               />
             </div>
 
-            <button
-              onClick={handleGenerate}
-              disabled={selectedPlayers.length < 2 || isGenerating}
-              className={`flex items-center gap-2 py-2.5 px-6 font-bold rounded-lg transition-all text-sm shadow-lg ${
-                selectedPlayers.length >= 2
-                  ? 'bg-neonGreen hover:bg-neonGreen-dark text-darkBg shadow-neonGreen/10 active:scale-95'
-                  : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-darkBg-border'
-              }`}
-            >
-              <Shuffle className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
-              {isGenerating ? 'Calculando Balanceo...' : 'Generar Equipos'}
-            </button>
+            {draftMode === 'auto' && (
+              <button
+                onClick={handleGenerate}
+                disabled={selectedPlayers.length < 2 || isGenerating}
+                className={`flex items-center gap-2 py-2.5 px-6 font-bold rounded-lg transition-all text-sm shadow-lg ${
+                  selectedPlayers.length >= 2
+                    ? 'bg-neonGreen hover:bg-neonGreen-dark text-darkBg shadow-neonGreen/10 active:scale-95'
+                    : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-darkBg-border'
+                }`}
+              >
+                <Shuffle className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                {isGenerating ? 'Calculando Balanceo...' : 'Generar Equipos'}
+              </button>
+            )}
           </div>
         </div>
 
         {selectedPlayers.length < 2 && (
           <div className="mt-4 flex items-center gap-2 p-2.5 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-lg text-xs">
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-            <span>Debes seleccionar al menos 2 jugadores para poder generar equipos equilibrados.</span>
+            <span>Debes seleccionar al menos 2 jugadores para poder armar los equipos.</span>
           </div>
         )}
       </div>
 
-      {/* Resultados del Draft */}
-      {teams.length > 0 && (
+      {/* RENDERIZADO DEL MODO MANUAL */}
+      {draftMode === 'manual' && selectedPlayers.length >= 2 && (
+        <div className="space-y-6">
+          {/* Jugadores Disponibles para Asignar */}
+          <div className="bg-darkBg-card border border-darkBg-border rounded-xl p-5 shadow-lg">
+            <h4 className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-3 flex items-center gap-2">
+              <Users className="w-4 h-4 text-neonGreen" /> Jugadores Disponibles ({unassignedPlayers.length})
+            </h4>
+            
+            {unassignedPlayers.length === 0 ? (
+              <p className="text-xs text-neonGreen/80 font-bold bg-neonGreen/5 py-3 px-4 rounded-lg border border-neonGreen/10 text-center">
+                🎉 ¡Todos los jugadores han sido asignados a un equipo!
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                {unassignedPlayers.map((player) => (
+                  <div
+                    key={player.id}
+                    className="flex items-center justify-between p-2.5 bg-darkBg-input/40 border border-darkBg-border/50 rounded-lg text-xs hover:bg-darkBg-input/80 transition-all"
+                  >
+                    <div className="flex items-center gap-2 min-w-0 mr-2">
+                      <img
+                        src={player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`}
+                        alt={player.name}
+                        className="w-7 h-7 rounded-full border border-darkBg-border object-cover bg-darkBg-card"
+                        onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
+                      />
+                      <span className="font-semibold text-gray-300 truncate">{player.name}</span>
+                      <span className="text-neonGreen font-bold flex-shrink-0">({player.skillLevel}★)</span>
+                    </div>
+
+                    <div className="flex gap-1 flex-shrink-0">
+                      {Array.from({ length: numTeams }).map((_, teamIdx) => (
+                        <button
+                          key={teamIdx}
+                          onClick={() => handleAssignPlayer(player.id, teamIdx)}
+                          className="px-1.5 py-1 bg-neonGreen/10 hover:bg-neonGreen/30 text-neonGreen hover:text-white border border-neonGreen/20 rounded font-bold transition-all text-[9px]"
+                          title={`Asignar al Equipo ${teamIdx + 1}`}
+                        >
+                          E{teamIdx + 1}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => handleAssignPlayer(player.id, 'sub')}
+                        className="px-1.5 py-1 bg-yellow-500/10 hover:bg-yellow-500/30 text-yellow-400 hover:text-white border border-yellow-500/20 rounded font-bold transition-all text-[9px]"
+                        title="Asignar como Suplente"
+                      >
+                        Sup
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Grilla de Equipos Manuales */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {manualTeamsList.map((team, idx) => {
+              const stats = manualStatsList[idx];
+              return (
+                <div
+                  key={idx}
+                  className={`bg-gradient-to-br ${getTeamColor(idx)} border rounded-2xl p-5 shadow-xl transition-all duration-300`}
+                >
+                  <div className="flex items-center justify-between border-b border-darkBg-border/50 pb-3 mb-4">
+                    <h5 className="font-extrabold text-white text-lg flex items-center gap-2">
+                      Equipo {idx + 1}
+                      <span className="text-xs font-medium text-gray-400">({team.length} jug.)</span>
+                    </h5>
+                    {stats && (
+                      <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full border ${getTeamHeaderBg(idx)}`}>
+                        Fuerza: {stats.avgSkill} ⭐
+                      </span>
+                    )}
+                  </div>
+
+                  {team.length === 0 ? (
+                    <div className="py-6 text-center text-xs text-gray-500 border border-dashed border-darkBg-border rounded-lg">
+                      Sin jugadores asignados
+                    </div>
+                  ) : (
+                    <ul className="space-y-2">
+                      {team.map((player) => (
+                        <li
+                          key={player.id}
+                          className="flex items-center justify-between py-2 px-3 bg-darkBg-input/30 rounded-lg border border-darkBg-border/20 text-sm hover:bg-white/5 transition-all"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0 mr-2">
+                            <img
+                              src={player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`}
+                              alt={player.name}
+                              className="w-8 h-8 rounded-full border border-darkBg-border/50 object-cover bg-darkBg-card"
+                              onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
+                            />
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-semibold text-gray-200 truncate">{player.name}</span>
+                              {player.isSpecial && (
+                                <span className="text-[8px] bg-neonGreen/10 text-neonGreen font-semibold px-1 rounded border border-neonGreen/20 flex items-center gap-0.5 w-fit mt-0.5 uppercase">
+                                  <Shield className="w-2 h-2" /> {sport.specialPositions[0]?.toUpperCase()}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <div className="flex gap-0.5">
+                              {Array.from({ length: player.skillLevel }).map((_, i) => (
+                                <span key={i} className="text-neonGreen text-xs">★</span>
+                              ))}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemovePlayer(player.id)}
+                              className="p-1 hover:bg-red-500/10 text-gray-500 hover:text-red-400 rounded-full transition-all"
+                              title="Remover de este equipo"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Suplentes Manuales */}
+          {manualSubstitutesList.length > 0 && (
+            <div className="bg-darkBg-card border border-darkBg-border rounded-xl p-5 shadow-lg">
+              <h5 className="text-sm font-bold text-yellow-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <Users className="w-4 h-4" /> Suplentes ({manualSubstitutesList.length})
+              </h5>
+              <div className="flex flex-wrap gap-2">
+                {manualSubstitutesList.map((player) => (
+                  <div
+                    key={player.id}
+                    className="flex items-center gap-2 py-1 pl-2.5 pr-1 bg-darkBg-input/60 border border-darkBg-border rounded-full text-xs font-semibold"
+                  >
+                    <img
+                      src={player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`}
+                      alt={player.name}
+                      className="w-5 h-5 rounded-full border border-darkBg-border/30 object-cover bg-darkBg-card"
+                      onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
+                    />
+                    <span className="text-gray-300">{player.name}</span>
+                    <span className="text-yellow-400 font-bold">({player.skillLevel}★)</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemovePlayer(player.id)}
+                      className="p-0.5 hover:bg-red-500/20 text-gray-500 hover:text-red-400 rounded-full transition-all"
+                      title="Quitar de Suplentes"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* RENDERIZADO DEL MODO AUTOMÁTICO */}
+      {draftMode === 'auto' && teams.length > 0 && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-bold text-gray-300 uppercase tracking-widest">
