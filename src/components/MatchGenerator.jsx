@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Sparkles, Users, Shuffle, Shield, AlertTriangle, CheckCircle, Calendar, Clock, X } from 'lucide-react';
 import { generateBalancedTeams } from '../utils/smartDraft';
 
