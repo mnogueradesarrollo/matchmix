@@ -39,9 +39,9 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
     reader.onload = (event) => {
       const img = new window.Image();
       img.onload = () => {
-        // Redimensionar la imagen a un avatar cuadrado de 150x150px
+        // Redimensionar la imagen a un avatar cuadrado de 400x400px
         const canvas = document.createElement('canvas');
-        const maxDim = 150;
+        const maxDim = 400;
         let width = img.width;
         let height = img.height;
 
@@ -88,7 +88,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
       const img = new window.Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const maxDim = 150;
+        const maxDim = 400;
         let width = img.width;
         let height = img.height;
 
