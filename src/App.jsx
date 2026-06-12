@@ -252,14 +252,17 @@ export default function App() {
               onToggleSelectPlayer={handleToggleSelectPlayer}
               onSelectAll={handleSelectAll}
               onDeselectAll={handleDeselectAll}
+              isAdmin={isAdmin}
             />
 
-            {/* Generador de Partidos */}
-            <MatchGenerator
-              selectedPlayers={activePlayersToDraft}
-              sport={selectedSport}
-              onConfirmMatch={handleConfirmMatch}
-            />
+            {/* Generador de Partidos (Solo Admin) */}
+            {isAdmin && (
+              <MatchGenerator
+                selectedPlayers={activePlayersToDraft}
+                sport={selectedSport}
+                onConfirmMatch={handleConfirmMatch}
+              />
+            )}
 
             {/* Historial de Partidos */}
             <MatchHistory
