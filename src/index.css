@@ -1,31 +1,43 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @import "tailwindcss";
 
 @theme {
-  --color-neonGreen: #deff9a;
-  --color-neonGreen-dark: #c4ef69;
-  --color-neonGreen-light: #e9ffb5;
+  --color-neonGreen: #adff2f;
+  --color-neonGreen-dark: #8edf1b;
+  --color-neonGreen-light: #caff70;
   
-  --color-darkBg: #0b0f19;
-  --color-darkBg-card: #161d30;
-  --color-darkBg-border: #242f4c;
-  --color-darkBg-input: #1d273f;
+  --color-brand-obsidian: #0a0b10;
+  --color-brand-slate: #131622;
+  --color-brand-steel: #21273b;
+  --color-brand-orange: #ff5e3a;
+  --color-brand-orange-dark: #e04622;
+  --color-brand-lime: #a3e635;
   
-  --font-sans: 'Outfit', 'Inter', 'sans-serif';
+  --color-darkBg: #0a0b10;
+  --color-darkBg-card: #131622;
+  --color-darkBg-border: #21273b;
+  --color-darkBg-input: #1b1f30;
+  
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'Space Grotesk', monospace;
 }
 
 @utility bg-darkBg {
-  background-color: var(--color-darkBg);
+  background-color: var(--color-brand-obsidian);
 }
 
 @utility text-gray-100 {
-  color: var(--color-gray-100);
+  color: #f3f4f6;
 }
 
 @layer base {
   body {
-    background-color: var(--color-darkBg);
+    background-color: var(--color-brand-obsidian);
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(255, 94, 58, 0.03) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(163, 230, 53, 0.03) 0%, transparent 40%);
     color: #f3f4f6;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -39,12 +51,20 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0f19;
+  background: var(--color-brand-obsidian);
 }
 ::-webkit-scrollbar-thumb {
-  background: #242f4c;
+  background: var(--color-brand-steel);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #deff9a;
+  background: var(--color-brand-orange);
 }
+
+/* Custom Micro-patterns */
+.telemetry-grid {
+  background-size: 20px 20px;
+  background-image: linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+}
+

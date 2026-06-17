@@ -198,16 +198,16 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
 
       {/* Columna Izquierda: Formulario de Carga Rápida o Edición (Solo Admin) */}
       {isAdmin && (
-        <div className="md:col-span-5 bg-darkBg-card border border-darkBg-border rounded-xl p-5 shadow-lg h-fit">
-          <div className="flex items-center justify-between mb-4 border-b border-darkBg-border pb-2">
-            <h3 className="text-sm font-bold text-gray-200 uppercase tracking-wider flex items-center gap-2">
+        <div className="md:col-span-5 bg-brand-slate border border-brand-steel rounded-xl p-5 shadow-lg shadow-black/35 h-fit">
+          <div className="flex items-center justify-between mb-4 border-b border-brand-steel pb-2">
+            <h3 className="text-sm font-bold text-gray-200 uppercase tracking-wider flex items-center gap-2 font-display">
               {editingPlayer ? (
                 <>
-                  <Edit2 className="w-4 h-4 text-neonGreen" /> Editar Jugador
+                  <Edit2 className="w-4 h-4 text-brand-orange" /> Editar Jugador
                 </>
               ) : (
                 <>
-                  <Plus className="w-4 h-4 text-neonGreen" /> Agregar Jugador
+                  <Plus className="w-4 h-4 text-brand-orange" /> Agregar Jugador
                 </>
               )}
             </h3>
@@ -215,7 +215,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
               <button
                 type="button"
                 onClick={cancelEdit}
-                className="text-gray-400 hover:text-red-400 transition-all"
+                className="text-gray-400 hover:text-red-400 transition-all cursor-pointer"
                 title="Cancelar Edición"
               >
                 <X className="w-4 h-4" />
@@ -226,16 +226,16 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
           <form onSubmit={handleSubmit} className="space-y-4">
             
             {/* Avatar Preview */}
-            <div className="flex flex-col items-center justify-center p-4 bg-darkBg-input/30 border border-darkBg-border/50 rounded-lg gap-3">
+            <div className="flex flex-col items-center justify-center p-4 bg-brand-obsidian/30 border border-brand-steel/50 rounded-lg gap-3">
               <div className="relative group cursor-pointer" onClick={triggerFileSelect} title="Haga clic para seleccionar foto de galería">
                 <img
                   src={getAvatarUrl()}
                   alt="Avatar Preview"
-                  className="w-20 h-20 rounded-full border-2 border-neonGreen object-cover bg-darkBg-card transition-all duration-300 group-hover:scale-105 group-hover:border-white shadow-lg"
+                  className="w-20 h-20 rounded-full border-2 border-brand-orange object-cover bg-brand-slate transition-all duration-300 group-hover:scale-105 group-hover:border-white shadow-lg"
                   onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                 />
                 <div className="absolute inset-0 flex flex-col items-center justify-center rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Upload className="w-5 h-5 text-neonGreen mb-0.5" />
+                  <Upload className="w-5 h-5 text-brand-orange mb-0.5" />
                   <span className="text-[9px] text-white font-bold uppercase tracking-wider">Subir Foto</span>
                 </div>
                 {!showCustomAvatarInput && (
@@ -245,7 +245,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                       e.stopPropagation();
                       handleRandomizeAvatar();
                     }}
-                    className="absolute -bottom-1 -right-1 p-1.5 bg-neonGreen text-darkBg rounded-full hover:scale-110 active:scale-95 transition-all shadow-md z-10"
+                    className="absolute -bottom-1 -right-1 p-1.5 bg-brand-orange text-white rounded-full hover:scale-110 active:scale-95 transition-all shadow-md z-10 cursor-pointer"
                     title="Generar avatar aleatorio"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
@@ -266,7 +266,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                 <button
                   type="button"
                   onClick={triggerFileSelect}
-                  className="px-4 py-1.5 bg-neonGreen/10 border border-neonGreen/30 text-neonGreen hover:bg-neonGreen/20 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5"
+                  className="px-4 py-1.5 bg-brand-orange/10 border border-brand-orange/30 text-brand-orange hover:bg-brand-orange/20 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Upload className="w-3.5 h-3.5" /> Seleccionar de Galería
                 </button>
@@ -276,7 +276,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                 <button
                   type="button"
                   onClick={() => setShowCustomAvatarInput(!showCustomAvatarInput)}
-                  className="text-[10px] text-gray-500 hover:text-neonGreen transition-all font-semibold mt-2 underline underline-offset-2"
+                  className="text-[10px] text-gray-500 hover:text-brand-orange transition-all font-semibold mt-2 underline underline-offset-2 cursor-pointer"
                 >
                   {showCustomAvatarInput ? 'Ocultar campo de URL' : 'Ingresar URL en su lugar'}
                 </button>
@@ -288,25 +288,25 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                   placeholder="https://ejemplo.com/foto.jpg"
                   value={customAvatarUrl}
                   onChange={(e) => setCustomAvatarUrl(e.target.value)}
-                  className="w-full bg-darkBg-input text-gray-100 rounded py-1.5 px-2 border border-darkBg-border focus:border-neonGreen outline-none text-xs"
+                  className="w-full bg-brand-obsidian text-gray-100 rounded py-1.5 px-2 border border-brand-steel focus:border-brand-orange outline-none text-xs"
                 />
               )}
             </div>
 
             <div>
-              <label className="block text-xs text-gray-400 font-semibold uppercase mb-1">Nombre</label>
+              <label className="block text-xs text-gray-400 font-semibold uppercase mb-1 font-mono">Nombre</label>
               <input
                 type="text"
                 required
                 placeholder="Ej: Alejandro G."
                 value={newPlayerName}
                 onChange={(e) => setNewPlayerName(e.target.value)}
-                className="w-full bg-darkBg-input text-gray-100 rounded-lg py-2 px-3 border border-darkBg-border focus:border-neonGreen focus:ring-1 focus:ring-neonGreen outline-none transition-all text-sm"
+                className="w-full bg-brand-obsidian text-gray-100 rounded-lg py-2 px-3 border border-brand-steel focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none transition-all text-sm"
               />
             </div>
 
             <div>
-              <label className="block text-xs text-gray-400 font-semibold uppercase mb-1">Habilidad (1-5)</label>
+              <label className="block text-xs text-gray-400 font-semibold uppercase mb-1 font-mono">Habilidad (1-5)</label>
               <div className="flex items-center gap-1.5 py-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -315,12 +315,12 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                     onClick={() => setSkillLevel(star)}
                     onMouseEnter={() => setHoverStar(star)}
                     onMouseLeave={() => setHoverStar(null)}
-                    className="transition-transform active:scale-95"
+                    className="transition-transform active:scale-95 cursor-pointer"
                   >
                     <Star
                       className={`w-6 h-6 transition-all ${
                         (hoverStar !== null ? star <= hoverStar : star <= skillLevel)
-                          ? 'fill-neonGreen text-neonGreen drop-shadow-[0_0_4px_rgba(222,255,154,0.3)]'
+                          ? 'fill-brand-orange text-brand-orange drop-shadow-[0_0_4px_rgba(255,94,58,0.3)]'
                           : 'text-gray-600'
                       }`}
                     />
@@ -331,10 +331,10 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
 
             {/* Posición especial inteligente */}
             {hasSpecialPosition && (
-              <div className="space-y-2.5 bg-darkBg-input/50 p-2.5 rounded-lg border border-darkBg-border">
+              <div className="space-y-2.5 bg-brand-obsidian/50 p-2.5 rounded-lg border border-brand-steel">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-300 flex items-center gap-1.5 font-semibold">
-                    <Shield className="w-3.5 h-3.5 text-neonGreen" /> ¿Tiene Rol Especial?
+                  <span className="text-xs text-gray-300 flex items-center gap-1.5 font-semibold font-mono">
+                    <Shield className="w-3.5 h-3.5 text-brand-orange" /> ¿Tiene Rol Especial?
                   </span>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -348,17 +348,17 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                       }}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-darkBg-input peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-neonGreen peer-checked:after:bg-darkBg peer-checked:after:border-none"></div>
+                    <div className="w-9 h-5 bg-brand-obsidian peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-orange peer-checked:after:bg-brand-obsidian peer-checked:after:border-none"></div>
                   </label>
                 </div>
 
                 {isSpecial && (
                   <div>
-                    <label className="block text-[10px] text-gray-400 uppercase mb-1">Posición/Rol</label>
+                    <label className="block text-[10px] text-gray-400 uppercase mb-1 font-mono">Posición/Rol</label>
                     <select
                       value={specialPositionType}
                       onChange={(e) => setSpecialPositionType(e.target.value)}
-                      className="w-full bg-darkBg-card text-gray-200 rounded py-1.5 px-2 border border-darkBg-border focus:border-neonGreen outline-none text-xs font-semibold cursor-pointer"
+                      className="w-full bg-brand-slate text-gray-200 rounded py-1.5 px-2 border border-brand-steel focus:border-brand-orange outline-none text-xs font-semibold cursor-pointer"
                     >
                       {sport.specialPositions.map((pos) => (
                         <option key={pos} value={pos}>
@@ -376,14 +376,14 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                 <button
                   type="button"
                   onClick={cancelEdit}
-                  className="flex-1 py-2.5 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white rounded-lg border border-darkBg-border transition-all text-sm font-semibold"
+                  className="flex-1 py-2.5 bg-transparent hover:bg-white/5 text-gray-400 hover:text-white rounded-lg border border-brand-steel transition-all text-sm font-semibold cursor-pointer font-mono"
                 >
                   Cancelar
                 </button>
               )}
               <button
                 type="submit"
-                className="flex-[2] py-2.5 bg-neonGreen hover:bg-neonGreen-dark text-darkBg font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-sm shadow-md shadow-neonGreen/10 active:scale-98"
+                className="flex-[2] py-2.5 bg-brand-orange hover:bg-brand-orange-dark text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-sm shadow-md shadow-brand-orange/10 active:scale-98 cursor-pointer font-mono"
               >
                 {editingPlayer ? 'Guardar Cambios' : (
                   <>
@@ -397,22 +397,22 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
       )}
 
       {/* Columna Derecha: Lista de Convocatoria */}
-      <div className={`${isAdmin ? 'md:col-span-7' : 'md:col-span-12'} bg-darkBg-card border border-darkBg-border rounded-xl p-5 shadow-lg flex flex-col min-h-[300px]`}>
+      <div className={`${isAdmin ? 'md:col-span-7' : 'md:col-span-12'} bg-brand-slate border border-brand-steel rounded-xl p-5 shadow-lg shadow-black/35 flex flex-col min-h-[300px]`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <h3 className="text-sm font-bold text-gray-200 uppercase tracking-wider flex items-center gap-2">
+          <h3 className="text-sm font-bold text-gray-200 uppercase tracking-wider flex items-center gap-2 font-display">
             {isAdmin ? `Lista de Jugadores (${selectedPlayerIds.length}/${players.length} listos)` : `Plantilla de Jugadores (${players.length})`}
           </h3>
           {isAdmin && (
-            <div className="flex gap-2 text-xs">
+            <div className="flex gap-2 text-xs font-mono">
               <button
                 onClick={onSelectAll}
-                className="px-2.5 py-1.5 bg-darkBg-input text-gray-300 border border-darkBg-border rounded hover:border-neonGreen hover:text-neonGreen transition-all flex items-center gap-1"
+                className="px-2.5 py-1.5 bg-brand-obsidian text-gray-300 border border-brand-steel rounded hover:border-brand-orange hover:text-brand-orange transition-all flex items-center gap-1 cursor-pointer"
               >
                 <CheckSquare className="w-3.5 h-3.5" /> Todos
               </button>
               <button
                 onClick={onDeselectAll}
-                className="px-2.5 py-1.5 bg-darkBg-input text-gray-300 border border-darkBg-border rounded hover:border-red-500/50 hover:text-red-400 transition-all flex items-center gap-1"
+                className="px-2.5 py-1.5 bg-brand-obsidian text-gray-300 border border-brand-steel rounded hover:border-red-500/50 hover:text-red-400 transition-all flex items-center gap-1 cursor-pointer"
               >
                 <Square className="w-3.5 h-3.5" /> Ninguno
               </button>
@@ -428,15 +428,15 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
             placeholder="Buscar jugador..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-darkBg-input text-gray-100 rounded-lg py-2 pl-9 pr-4 border border-darkBg-border focus:border-neonGreen focus:ring-1 focus:ring-neonGreen outline-none transition-all text-xs"
+            className="w-full bg-brand-obsidian text-gray-100 rounded-lg py-2 pl-9 pr-4 border border-brand-steel focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none transition-all text-xs"
           />
         </div>
 
         {/* Lista Scrollable */}
         <div className="flex-1 overflow-y-auto max-h-[360px] space-y-2 pr-1">
           {filteredPlayers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-gray-500 text-xs">
-              <User className="w-8 h-8 mb-2 stroke-1 opacity-50" />
+            <div className="flex flex-col items-center justify-center py-8 text-gray-500 text-xs font-mono">
+              <User className="w-8 h-8 mb-2 stroke-1 opacity-50 text-brand-orange" />
               <span>{searchQuery ? 'No se encontraron resultados.' : 'Sin jugadores registrados en este deporte.'}</span>
             </div>
           ) : (
@@ -449,14 +449,14 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                   className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-200 select-none ${
                     isAdmin
                       ? isSelected
-                        ? 'bg-neonGreen/5 border-neonGreen/30 hover:bg-neonGreen/10 cursor-pointer'
-                        : 'bg-darkBg-input/40 border-darkBg-border/50 hover:bg-darkBg-input/80 cursor-pointer'
-                      : 'bg-darkBg-input/40 border-darkBg-border/50'
+                        ? 'bg-brand-orange/5 border-brand-orange/30 hover:bg-brand-orange/10 cursor-pointer shadow-[0_0_12px_rgba(255,94,58,0.05)]'
+                        : 'bg-brand-obsidian/40 border-brand-steel/50 hover:bg-brand-obsidian/80 cursor-pointer'
+                      : 'bg-brand-obsidian/40 border-brand-steel/50'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     {isAdmin && (
-                      <div className={`p-1 rounded ${isSelected ? 'text-neonGreen' : 'text-gray-600'}`}>
+                      <div className={`p-1 rounded ${isSelected ? 'text-brand-orange' : 'text-gray-600'}`}>
                         {isSelected ? <CheckSquare className="w-4.5 h-4.5" /> : <Square className="w-4.5 h-4.5" />}
                       </div>
                     )}
@@ -470,7 +470,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                           onViewAvatar(player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`, player.name);
                         }
                       }}
-                      className="w-10 h-10 rounded-full border border-darkBg-border object-cover bg-darkBg-card cursor-zoom-in hover:scale-105 transition-all"
+                      className="w-10 h-10 rounded-full border border-brand-steel object-cover bg-brand-slate cursor-zoom-in hover:scale-105 transition-all"
                       onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                     />
 
@@ -480,7 +480,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                           {player.name}
                         </span>
                         {player.isSpecial && player.specialPositionType && (
-                          <span className="text-[9px] bg-neonGreen/10 text-neonGreen font-semibold px-1.5 py-0.5 rounded border border-neonGreen/20 flex items-center gap-0.5 uppercase">
+                          <span className="text-[9px] bg-brand-lime/10 text-brand-lime font-bold px-1.5 py-0.5 rounded border border-brand-lime/20 flex items-center gap-0.5 uppercase font-mono">
                             <Shield className="w-2.5 h-2.5" /> {player.specialPositionType}
                           </span>
                         )}
@@ -491,7 +491,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                           <Star
                             key={i}
                             className={`w-3 h-3 ${
-                              i < player.skillLevel ? 'fill-neonGreen text-neonGreen' : 'text-gray-700'
+                              i < player.skillLevel ? 'fill-brand-orange text-brand-orange' : 'text-gray-700'
                             }`}
                           />
                         ))}
@@ -507,7 +507,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                             e.stopPropagation();
                             startEdit(player);
                           }}
-                          className="p-1.5 text-gray-500 hover:text-neonGreen hover:bg-neonGreen/10 rounded transition-all"
+                          className="p-1.5 text-gray-500 hover:text-brand-orange hover:bg-brand-orange/10 rounded transition-all cursor-pointer"
                           title="Editar jugador"
                         >
                           <Edit2 className="w-4 h-4" />
@@ -517,7 +517,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                             e.stopPropagation();
                             onDeletePlayer(player.id);
                           }}
-                          className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-all"
+                          className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-all cursor-pointer"
                           title="Eliminar jugador"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -529,7 +529,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                           e.stopPropagation();
                           triggerGuestFileSelect(player.id);
                         }}
-                        className="px-2.5 py-1.5 bg-neonGreen/10 hover:bg-neonGreen/20 text-neonGreen border border-neonGreen/25 hover:border-neonGreen/50 rounded-lg text-xs font-bold transition-all flex items-center gap-1 active:scale-95 shadow-sm shadow-neonGreen/5"
+                        className="px-2.5 py-1.5 bg-brand-orange/10 hover:bg-brand-orange/20 text-brand-orange border border-brand-orange/25 hover:border-brand-orange/50 rounded-lg text-xs font-bold transition-all flex items-center gap-1 active:scale-95 shadow-sm shadow-brand-orange/5 cursor-pointer font-mono"
                         title="Subir tu foto de perfil desde tu celular"
                       >
                         <Camera className="w-3.5 h-3.5" /> Subir Foto
@@ -546,3 +546,4 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
     </div>
   );
 }
+

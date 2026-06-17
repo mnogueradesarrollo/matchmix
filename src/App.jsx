@@ -175,26 +175,26 @@ export default function App() {
   const activePlayersToDraft = players.filter(p => selectedPlayerIds.includes(p.id));
 
   return (
-    <div className="min-h-screen bg-darkBg text-gray-100 flex flex-col">
+    <div className="min-h-screen bg-brand-obsidian text-gray-100 flex flex-col telemetry-grid">
       {/* Header Banner */}
-      <header className="border-b border-darkBg-border/80 bg-darkBg-card/50 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-brand-steel/65 bg-brand-slate/60 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             {/* Custom Premium Logo */}
             <div className="relative w-11 h-11 flex items-center justify-center">
-              <div className="absolute inset-0 bg-neonGreen/20 blur-md rounded-xl animate-pulse"></div>
-              <div className="relative w-11 h-11 bg-darkBg-card border border-neonGreen/30 rounded-xl flex items-center justify-center shadow-lg shadow-neonGreen/10 hover:border-neonGreen transition-all duration-300">
-                <svg className="w-7 h-7 text-neonGreen" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <div className="absolute inset-0 bg-brand-orange/20 blur-md rounded-xl animate-pulse"></div>
+              <div className="relative w-11 h-11 bg-brand-slate border border-brand-orange/30 rounded-xl flex items-center justify-center shadow-lg shadow-brand-orange/10 hover:border-brand-orange transition-all duration-300">
+                <svg className="w-7 h-7 text-brand-orange" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M 22 72 L 22 35 L 50 63 L 78 35 L 78 72" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
                   <circle cx="50" cy="24" r="7" fill="currentColor" />
                 </svg>
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-1">
-                MATCH<span className="text-neonGreen drop-shadow-[0_0_10px_rgba(222,255,154,0.4)]">MIX</span>
+              <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-1 font-display">
+                MATCH<span className="text-brand-orange drop-shadow-[0_0_10px_rgba(255,94,58,0.4)]">MIX</span>
               </h1>
-              <p className="text-[10px] text-neonGreen/80 font-bold tracking-widest uppercase">
+              <p className="text-[9px] text-brand-orange/80 font-bold tracking-widest uppercase font-mono">
                 Generador y Balanceador de Equipos
               </p>
             </div>
@@ -204,22 +204,22 @@ export default function App() {
             {/* Admin Toggle */}
             <button 
               onClick={handleAdminClick}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all duration-300 ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all duration-300 font-mono cursor-pointer ${
                 isAdmin 
-                  ? 'bg-red-500/10 text-red-400 border-red-500/30 shadow-md shadow-red-500/5' 
-                  : 'bg-darkBg-input text-gray-400 border-darkBg-border hover:text-white'
+                  ? 'bg-red-500/10 text-red-400 border-red-500/30 shadow-md shadow-red-500/5 hover:bg-red-500/20' 
+                  : 'bg-brand-slate text-gray-400 border-brand-steel hover:text-white hover:border-brand-orange/50'
               }`}
             >
               <ShieldAlert className="w-3.5 h-3.5" />
               {isAdmin ? 'Cerrar Admin' : 'Modo Admin'}
             </button>
 
-            <div className="flex items-center gap-2 border-l border-darkBg-border pl-3">
+            <div className="flex items-center gap-2 border-l border-brand-steel pl-3">
               <span className="flex h-2 w-2 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neonGreen opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-neonGreen"></span>
               </span>
-              <span className="text-xs font-semibold text-gray-300">
+              <span className="text-[11px] font-mono font-semibold text-gray-400">
                 {USE_LOCAL_MOCK ? 'Modo Local' : 'Firebase'}
               </span>
             </div>
@@ -228,7 +228,7 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-6xl w-full mx-auto py-8">
+      <main className="flex-1 max-w-6xl w-full mx-auto py-8 px-4">
         
         {/* Selector de Deporte */}
         <SportSelector
