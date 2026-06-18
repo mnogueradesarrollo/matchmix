@@ -4,6 +4,7 @@ import SportSelector from './components/SportSelector';
 import PlayerRoster from './components/PlayerRoster';
 import MatchGenerator from './components/MatchGenerator';
 import MatchHistory from './components/MatchHistory';
+import UpcomingMatches from './components/UpcomingMatches';
 import AuthModal from './components/AuthModal';
 import { Sparkles, Trophy, Users, ShieldAlert, Cpu, X } from 'lucide-react';
 import { USE_LOCAL_MOCK, auth } from './firebase';
@@ -243,6 +244,15 @@ export default function App() {
 
         {selectedSport && (
           <>
+            {/* Cartelera de Partidos (Pendientes) */}
+            <UpcomingMatches
+              matches={matches}
+              isAdmin={isAdmin}
+              onUpdateMatchScore={handleUpdateMatchScore}
+              onDeleteMatch={handleDeleteMatch}
+              onViewAvatar={(url, name) => { setActivePhotoUrl(url); setActivePhotoName(name); }}
+            />
+
             {/* Roster de Jugadores */}
             <PlayerRoster
               players={players}
