@@ -9,16 +9,16 @@ function shuffle(array) {
 }
 
 /**
- * Algoritmo Smart-Draft para balancear equipos.
+ * Algoritmo Smart-Draft para balancear equipos equitativamente por género.
  * 
- * @param {Array} players - Listado de jugadores seleccionados: { id, name, skillLevel, isSpecial }
+ * @param {Array} players - Listado de jugadores seleccionados: { id, name, gender, isSpecial }
  * @param {number} playersPerTeam - Número de jugadores requeridos por equipo (ej: 5 para Fútbol 5)
  * @param {number} forcedTeamCount - Opcional. Forzar una cantidad específica de equipos.
- * @returns {Object} { teams: Array<Array>, substitutes: Array, averageSkills: Array }
+ * @returns {Object} { teams: Array<Array>, substitutes: Array, stats: Array }
  */
 export function generateBalancedTeams(players, playersPerTeam, forcedTeamCount = null) {
   if (!players || players.length === 0) {
-    return { teams: [], substitutes: [], averageSkills: [] };
+    return { teams: [], substitutes: [], stats: [] };
   }
 
   // Determinar cuántos equipos se van a formar
@@ -34,21 +34,22 @@ export function generateBalancedTeams(players, playersPerTeam, forcedTeamCount =
   }
 
   if (numTeams < 1) {
-    return { teams: [], substitutes: [...players], averageSkills: [] };
+    return { teams: [], substitutes: [...players], stats: [] };
   }
 
-  // Mezclar aleatoriamente el conjunto de jugadores antes de ordenar para romper empates al azar
+  // Mezclar aleatoriamente el conjunto de jugadores
   const shuffledPlayers = shuffle(players);
 
-  // Separar posiciones especiales (ej: arqueros) y jugadores regulares
+  // Separar posiciones especiales y regulares
   const specialPlayers = shuffledPlayers.filter(p => p.isSpecial);
   const regularPlayers = shuffledPlayers.filter(p => !p.isSpecial);
 
-  // Ordenar ambos grupos por nivel de habilidad de mayor a menor (5 -> 1)
-  // Al haber mezclado antes, los empates se resuelven de forma aleatoria y fresca en cada ejecución
-  const sortDesc = (a, b) => b.skillLevel - a.skillLevel;
-  specialPlayers.sort(sortDesc);
-  regularPlayers.sort(sortDesc);
+  // Agrupar los regulares por género y mezclarlos por separado
+  const femalePlayers = shuffle(regularPlayers.filter(p => p.gender?.toLowerCase() === 'femenino'));
+  const malePlayers = shuffle(regularPlayers.filter(p => p.gender?.toLowerCase() !== 'femenino'));
+
+  // Concatenar primero femeninos y luego masculinos para que el snake draft los distribuya equitativamente
+  const finalRegularPool = [...femalePlayers, ...malePlayers];
 
   // Inicializar equipos vacíos
   const teams = Array.from({ length: numTeams }, () => []);
@@ -64,12 +65,9 @@ export function generateBalancedTeams(players, playersPerTeam, forcedTeamCount =
         .filter(t => t.length < maxTeamSize);
 
       if (availableTeams.length === 0) {
-        // No hay más espacio en ningún equipo bajo el límite actual
         return pool.slice(pool.indexOf(player));
       }
 
-      // Si la dirección actual del snake apunta a un equipo lleno, ajustamos el índice
-      // hasta encontrar un equipo con espacio
       let iterations = 0;
       while (teams[currentTeamIndex].length >= maxTeamSize && iterations < numTeams) {
         if (goingForward) {
@@ -88,7 +86,7 @@ export function generateBalancedTeams(players, playersPerTeam, forcedTeamCount =
         iterations++;
       }
 
-      // Añadir jugador al equipo
+      // Añadir jugador
       teams[currentTeamIndex].push(player);
 
       // Avanzar el índice de la serpiente
@@ -96,13 +94,13 @@ export function generateBalancedTeams(players, playersPerTeam, forcedTeamCount =
         if (currentTeamIndex < numTeams - 1) {
           currentTeamIndex++;
         } else {
-          goingForward = false; // Cambiar dirección en el extremo derecho
+          goingForward = false;
         }
       } else {
         if (currentTeamIndex > 0) {
           currentTeamIndex--;
         } else {
-          goingForward = true; // Cambiar dirección en el extremo izquierdo
+          goingForward = true;
         }
       }
     }
@@ -112,26 +110,27 @@ export function generateBalancedTeams(players, playersPerTeam, forcedTeamCount =
   // 1. Distribuir arqueros primero (máximo 1 por equipo si es posible)
   const remainingSpecial = distributeSnake(specialPlayers, 1);
 
-  // Unir arqueros sobrantes con los jugadores regulares
-  const finalRegularPool = [...remainingSpecial, ...regularPlayers];
+  // Unir arqueros sobrantes con la lista regular
+  const finalPool = [...remainingSpecial, ...finalRegularPool];
 
   // 2. Distribuir el resto de los jugadores hasta completar el tamaño de equipo requerido
-  const remainingPlayers = distributeSnake(finalRegularPool, playersPerTeam);
+  const remainingPlayers = distributeSnake(finalPool, playersPerTeam);
 
-  // Calcular estadísticas de balanceo de los equipos resultantes
-  const teamStats = teams.map((team, idx) => {
-    const totalSkill = team.reduce((sum, p) => sum + p.skillLevel, 0);
-    const avgSkill = team.length > 0 ? (totalSkill / team.length).toFixed(1) : 0;
+  // Calcular estadísticas de balanceo de géneros de los equipos resultantes
+  const stats = teams.map((team, idx) => {
+    const femaleCount = team.filter(p => p.gender?.toLowerCase() === 'femenino').length;
+    const maleCount = team.length - femaleCount;
     return {
       teamIndex: idx,
-      totalSkill,
-      avgSkill: parseFloat(avgSkill)
+      femaleCount,
+      maleCount
     };
   });
 
   return {
     teams,
     substitutes: remainingPlayers,
-    stats: teamStats
+    stats
   };
 }
+

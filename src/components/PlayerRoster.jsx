@@ -3,7 +3,7 @@ import { Star, Plus, Shield, User, Trash2, CheckSquare, Square, Search, RefreshC
 
 export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlayer, onDeletePlayer, selectedPlayerIds, onToggleSelectPlayer, onSelectAll, onDeselectAll, isAdmin = false, onViewAvatar }) {
   const [newPlayerName, setNewPlayerName] = useState('');
-  const [skillLevel, setSkillLevel] = useState(3);
+  const [gender, setGender] = useState('Masculino');
   const [isSpecial, setIsSpecial] = useState(false);
   const [specialPositionType, setSpecialPositionType] = useState(sport.specialPositions?.[0] || '');
   const [avatarSeed, setAvatarSeed] = useState(() => Math.floor(Math.random() * 1000).toString());
@@ -131,7 +131,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
   const startEdit = (player) => {
     setEditingPlayer(player);
     setNewPlayerName(player.name);
-    setSkillLevel(player.skillLevel);
+    setGender(player.gender || 'Masculino');
     setIsSpecial(player.isSpecial);
     setSpecialPositionType(player.specialPositionType || sport.specialPositions?.[0] || '');
     if (player.avatar.includes('dicebear.com')) {
@@ -150,7 +150,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
   const cancelEdit = () => {
     setEditingPlayer(null);
     setNewPlayerName('');
-    setSkillLevel(3);
+    setGender('Masculino');
     setIsSpecial(false);
     setSpecialPositionType(sport.specialPositions?.[0] || '');
     setAvatarSeed(Math.floor(Math.random() * 10000).toString());
@@ -164,7 +164,7 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
 
     const playerData = {
       name: newPlayerName.trim(),
-      skillLevel,
+      gender,
       isSpecial: sport.specialPositions?.length > 0 ? isSpecial : false,
       specialPositionType: (sport.specialPositions?.length > 0 && isSpecial) ? specialPositionType : '',
       sportId: sport.id,
@@ -306,26 +306,22 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
             </div>
 
             <div>
-              <label className="block text-xs text-gray-400 font-semibold uppercase mb-1 font-mono">Habilidad (1-5)</label>
-              <div className="flex items-center gap-1.5 py-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setSkillLevel(star)}
-                    onMouseEnter={() => setHoverStar(star)}
-                    onMouseLeave={() => setHoverStar(null)}
-                    className="transition-transform active:scale-95 cursor-pointer"
-                  >
-                    <Star
-                      className={`w-6 h-6 transition-all ${
-                        (hoverStar !== null ? star <= hoverStar : star <= skillLevel)
-                          ? 'fill-brand-orange text-brand-orange drop-shadow-[0_0_4px_rgba(255,94,58,0.3)]'
-                          : 'text-gray-600'
-                      }`}
-                    />
-                  </button>
-                ))}
+              <label className="block text-xs text-gray-400 font-semibold uppercase mb-1.5 font-mono">Género</label>
+              <div className="flex bg-brand-obsidian p-1 rounded-xl border border-brand-steel w-full">
+                <button
+                  type="button"
+                  onClick={() => setGender('Masculino')}
+                  className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer font-mono ${gender === 'Masculino' ? 'bg-brand-orange text-white shadow' : 'text-gray-400 hover:text-white'}`}
+                >
+                  Masculino
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGender('Femenino')}
+                  className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer font-mono ${gender === 'Femenino' ? 'bg-brand-orange text-white shadow' : 'text-gray-400 hover:text-white'}`}
+                >
+                  Femenino
+                </button>
               </div>
             </div>
 
@@ -486,15 +482,14 @@ export default function PlayerRoster({ players, sport, onAddPlayer, onUpdatePlay
                         )}
                       </div>
                       
-                      <div className="flex items-center gap-0.5 mt-0.5">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-3 h-3 ${
-                              i < player.skillLevel ? 'fill-brand-orange text-brand-orange' : 'text-gray-700'
-                            }`}
-                          />
-                        ))}
+                      <div className="flex items-center gap-1.5 mt-1 font-mono text-[9px] font-bold">
+                        <span className={`px-2 py-0.5 rounded border uppercase ${
+                          player.gender?.toLowerCase() === 'femenino'
+                            ? 'bg-brand-lime/10 text-brand-lime border-brand-lime/20'
+                            : 'bg-brand-orange/10 text-brand-orange border-brand-orange/20'
+                        }`}>
+                          {player.gender || 'Masculino'}
+                        </span>
                       </div>
                     </div>
                   </div>

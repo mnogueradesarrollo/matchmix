@@ -32,12 +32,12 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch,
 
   // Estadísticas para modo manual
   const manualStatsList = manualTeamsList.map((team, idx) => {
-    const totalSkill = team.reduce((sum, p) => sum + p.skillLevel, 0);
-    const avgSkill = team.length > 0 ? (totalSkill / team.length).toFixed(1) : 0;
+    const femaleCount = team.filter(p => p.gender?.toLowerCase() === 'femenino').length;
+    const maleCount = team.length - femaleCount;
     return {
       teamIndex: idx,
-      totalSkill,
-      avgSkill: parseFloat(avgSkill)
+      femaleCount,
+      maleCount
     };
   });
 
@@ -89,9 +89,9 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch,
       date: matchDate,
       time: matchTime,
       teams: activeTeams.map(team => ({
-        players: team.map(p => ({ id: p.id, name: p.name, skillLevel: p.skillLevel, avatar: p.avatar }))
+        players: team.map(p => ({ id: p.id, name: p.name, gender: p.gender, avatar: p.avatar }))
       })),
-      substitutes: activeSubstitutes.map(p => ({ id: p.id, name: p.name, skillLevel: p.skillLevel, avatar: p.avatar })),
+      substitutes: activeSubstitutes.map(p => ({ id: p.id, name: p.name, gender: p.gender, avatar: p.avatar })),
       status: 'pendiente',
       score: { team1: null, team2: null }
     });
@@ -125,58 +125,60 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch,
     ? teams.length > 0 
     : Object.keys(manualAssignments).length > 0;
 
-  // Calculador de Equilibridad (Signature Element)
   const renderEquilibriumMeter = () => {
     const stats = draftMode === 'auto' ? teamStats : manualStatsList;
     const activeTeams = draftMode === 'auto' ? teams : manualTeamsList;
     if (activeTeams.length !== 2 || stats.length !== 2) return null;
 
-    const t1 = stats[0].avgSkill;
-    const t2 = stats[1].avgSkill;
-    const diff = Math.abs(t1 - t2);
+    const f1 = stats[0].femaleCount;
+    const f2 = stats[1].femaleCount;
+    const diff = Math.abs(f1 - f2);
     
-    // Si diff es 0 => 100% balanceado. Si diff >= 1.5 => ~50% balanceado.
-    const balancePct = Math.max(40, Math.round(100 - (diff * 30)));
+    // Balance score logic: perfect (diff <= 1 depending on odd/even)
+    const totalFemales = f1 + f2;
+    const isPerfect = (totalFemales % 2 === 0 && diff === 0) || (totalFemales % 2 !== 0 && diff === 1);
     
-    let label = 'Estabilidad Óptima';
+    const balancePct = isPerfect ? 100 : Math.max(30, 100 - (diff * 25));
+    
+    let label = 'Simetría de Géneros';
     let statusClass = 'text-brand-lime border-brand-lime/20 bg-brand-lime/5';
     let trackColor = 'bg-brand-lime';
     
-    if (diff > 0.3 && diff <= 0.7) {
-      label = 'Equilibrio Aceptable';
+    if (!isPerfect && diff <= 1) {
+      label = 'Equilibrio Óptimo';
+      statusClass = 'text-brand-lime border-brand-lime/20 bg-brand-lime/5';
+      trackColor = 'bg-brand-lime';
+    } else if (diff === 2) {
+      label = 'Desviación Moderada';
       statusClass = 'text-yellow-400 border-yellow-400/20 bg-yellow-400/5';
       trackColor = 'bg-yellow-400';
-    } else if (diff > 0.7) {
-      label = 'Desviación Competitiva';
+    } else if (diff > 2) {
+      label = 'Desbalance de Género';
       statusClass = 'text-brand-orange border-brand-orange/20 bg-brand-orange/5';
       trackColor = 'bg-brand-orange';
     }
 
     return (
       <div className="w-full bg-brand-slate border border-brand-steel rounded-xl p-4 mb-6 shadow-md shadow-black/25">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-2.5">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-2.5 font-mono">
           <div className="flex items-center gap-2">
             <Scale className="w-5 h-5 text-brand-orange" />
-            <h5 className="text-xs font-bold uppercase tracking-wider text-gray-300 font-mono">Índice de Simetría (Equilibrio)</h5>
+            <h5 className="text-xs font-bold uppercase tracking-wider text-gray-300">Nivelación de Géneros</h5>
           </div>
-          <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded border ${statusClass} font-mono`}>
+          <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded border ${statusClass}`}>
             {label} ({balancePct}%)
           </span>
         </div>
         
         {/* Telemetry Scale Visualization */}
         <div className="relative h-6 bg-brand-obsidian/60 border border-brand-steel/50 rounded-lg flex items-center px-4 overflow-hidden">
-          {/* Center axis mark */}
           <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-brand-steel/90 z-10"></div>
           
-          {/* Dynamic slider beam */}
           <div className="absolute top-1 bottom-1 left-1 right-1 rounded-md flex items-center justify-center">
-            {/* We offset from center based on difference. if t1 > t2, offset left. if t2 > t1, offset right */}
-            {/* Max offset will represent 1.5 skill diff which corresponds to 100% side bias */}
             {(() => {
-              const maxDiff = 1.5;
-              const normalizedDiff = Math.min(maxDiff, t2 - t1); // positive if t2 is stronger
-              const percentShift = (normalizedDiff / maxDiff) * 45; // max 45% shift left/right
+              const maxDiff = 4;
+              const femaleDiff = f2 - f1; // positive if Team 2 has more females
+              const percentShift = (femaleDiff / maxDiff) * 45; // max 45% shift left/right
               const leftPercent = 50 + percentShift;
               
               return (
@@ -188,11 +190,10 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch,
             })()}
           </div>
           
-          {/* Labels for side biases */}
           <div className="w-full flex justify-between text-[9px] font-bold font-mono text-gray-500 z-0">
-            <span>◄ SESGO EQUIPO 1</span>
-            <span>BALANCEADO</span>
-            <span>SESGO EQUIPO 2 ►</span>
+            <span>◄ SESGO FEMENINO E1</span>
+            <span>NIVELADO</span>
+            <span>SESGO FEMENINO E2 ►</span>
           </div>
         </div>
       </div>
@@ -324,7 +325,11 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch,
                         onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                       />
                       <span className="font-semibold text-gray-300 truncate">{player.name}</span>
-                      <span className="text-brand-orange font-bold flex-shrink-0">({player.skillLevel}★)</span>
+                      <span className={`px-1.5 py-0.5 rounded border uppercase text-[8px] font-bold ${
+                        player.gender?.toLowerCase() === 'femenino'
+                          ? 'bg-brand-lime/10 text-brand-lime border-brand-lime/20'
+                          : 'bg-brand-orange/10 text-brand-orange border-brand-orange/20'
+                      }`}>{player.gender === 'Femenino' ? 'FEM' : 'MASC'}</span>
                     </div>
 
                     <div className="flex gap-1 flex-shrink-0">
@@ -368,7 +373,7 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch,
                     </h5>
                     {stats && (
                       <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full border ${getTeamHeaderBg(idx)}`}>
-                        Fuerza: {stats.avgSkill} ⭐
+                        {stats.maleCount}M / {stats.femaleCount}F
                       </span>
                     )}
                   </div>
@@ -389,10 +394,10 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch,
                               src={player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`}
                               alt={player.name}
                               onClick={(e) => {
-                                e.stopPropagation();
-                                if (onViewAvatar) {
-                                  onViewAvatar(player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`, player.name);
-                                }
+                                  e.stopPropagation();
+                                  if (onViewAvatar) {
+                                    onViewAvatar(player.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(player.name)}`, player.name);
+                                  }
                               }}
                               className="w-8 h-8 rounded-full border border-brand-steel object-cover bg-brand-slate cursor-zoom-in hover:scale-105 transition-all"
                               onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
@@ -408,11 +413,11 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch,
                           </div>
 
                           <div className="flex items-center gap-2 flex-shrink-0">
-                            <div className="flex gap-0.5">
-                              {Array.from({ length: player.skillLevel }).map((_, i) => (
-                                <span key={i} className="text-brand-orange text-xs">★</span>
-                              ))}
-                            </div>
+                            <span className={`px-1.5 py-0.5 rounded border uppercase text-[8px] font-bold ${
+                              player.gender?.toLowerCase() === 'femenino'
+                                ? 'bg-brand-lime/10 text-brand-lime border-brand-lime/20'
+                                : 'bg-brand-orange/10 text-brand-orange border-brand-orange/20'
+                            }`}>{player.gender === 'Femenino' ? 'FEM' : 'MASC'}</span>
                             <button
                               type="button"
                               onClick={() => handleRemovePlayer(player.id)}
@@ -456,14 +461,18 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch,
                       onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                     />
                     <span className="text-gray-300">{player.name}</span>
-                    <span className="text-yellow-400 font-bold">({player.skillLevel}★)</span>
+                    <span className={`px-1.5 py-0.5 rounded border uppercase text-[8px] font-bold ${
+                      player.gender?.toLowerCase() === 'femenino'
+                        ? 'bg-brand-lime/10 text-brand-lime border-brand-lime/20'
+                        : 'bg-brand-orange/10 text-brand-orange border-brand-orange/20'
+                    }`}>{player.gender === 'Femenino' ? 'FEM' : 'MASC'}</span>
                     <button
                       type="button"
                       onClick={() => handleRemovePlayer(player.id)}
                       className="p-0.5 hover:bg-red-500/20 text-gray-500 hover:text-red-400 rounded-full transition-all cursor-pointer"
                       title="Quitar de Suplentes"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ))}
@@ -500,7 +509,7 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch,
                     </h5>
                     {stats && (
                       <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full border ${getTeamHeaderBg(idx)}`}>
-                        Fuerza: {stats.avgSkill} ⭐
+                        {stats.maleCount}M / {stats.femaleCount}F
                       </span>
                     )}
                   </div>
@@ -534,11 +543,11 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch,
                           </div>
                         </div>
 
-                        <div className="flex gap-0.5">
-                          {Array.from({ length: player.skillLevel }).map((_, i) => (
-                            <span key={i} className="text-brand-orange text-xs">★</span>
-                          ))}
-                        </div>
+                        <span className={`px-1.5 py-0.5 rounded border uppercase text-[8px] font-bold ${
+                          player.gender?.toLowerCase() === 'femenino'
+                            ? 'bg-brand-lime/10 text-brand-lime border-brand-lime/20'
+                            : 'bg-brand-orange/10 text-brand-orange border-brand-orange/20'
+                        }`}>{player.gender === 'Femenino' ? 'FEM' : 'MASC'}</span>
                       </li>
                     ))}
                   </ul>
@@ -572,7 +581,11 @@ export default function MatchGenerator({ selectedPlayers, sport, onConfirmMatch,
                       onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                     />
                     <span className="text-gray-300">{player.name}</span>
-                    <span className="text-yellow-400 font-bold">({player.skillLevel}★)</span>
+                    <span className={`px-1.5 py-0.5 rounded border uppercase text-[8px] font-bold ${
+                      player.gender?.toLowerCase() === 'femenino'
+                        ? 'bg-brand-lime/10 text-brand-lime border-brand-lime/20'
+                        : 'bg-brand-orange/10 text-brand-orange border-brand-orange/20'
+                    }`}>{player.gender === 'Femenino' ? 'FEM' : 'MASC'}</span>
                   </div>
                 ))}
               </div>

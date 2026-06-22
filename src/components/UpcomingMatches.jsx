@@ -105,7 +105,7 @@ export default function UpcomingMatches({ matches, isAdmin, onUpdateMatchScore, 
                         Equipo 1
                       </h4>
                       <span className="text-[10px] font-mono text-gray-400 font-bold bg-brand-steel/20 px-2 py-0.5 rounded">
-                        Fuerza Promedio: {(match.teams[0]?.players?.reduce((sum, p) => sum + p.skillLevel, 0) / (match.teams[0]?.players?.length || 1)).toFixed(1)} ★
+                        Formación: {match.teams[0]?.players?.filter(p => p.gender?.toLowerCase() === 'femenino').length}F / {match.teams[0]?.players?.length - match.teams[0]?.players?.filter(p => p.gender?.toLowerCase() === 'femenino').length}M
                       </span>
                     </div>
 
@@ -120,10 +120,12 @@ export default function UpcomingMatches({ matches, isAdmin, onUpdateMatchScore, 
                           />
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-semibold text-gray-200 truncate">{p.name}</p>
-                            <div className="flex gap-0.5 mt-0.5">
-                              {Array.from({ length: p.skillLevel }).map((_, i) => (
-                                <span key={i} className="text-brand-orange text-[9px]">★</span>
-                              ))}
+                            <div className="flex items-center gap-1.5 mt-1 font-mono text-[8px] font-bold">
+                              <span className={`px-1.5 py-0.2 rounded border uppercase ${
+                                p.gender?.toLowerCase() === 'femenino'
+                                  ? 'bg-brand-lime/10 text-brand-lime border-brand-lime/20'
+                                  : 'bg-brand-orange/10 text-brand-orange border-brand-orange/20'
+                              }`}>{p.gender === 'Femenino' ? 'FEM' : 'MASC'}</span>
                             </div>
                           </div>
                         </li>
@@ -139,7 +141,7 @@ export default function UpcomingMatches({ matches, isAdmin, onUpdateMatchScore, 
                         Equipo 2
                       </h4>
                       <span className="text-[10px] font-mono text-gray-400 font-bold bg-brand-steel/20 px-2 py-0.5 rounded">
-                        Fuerza Promedio: {(match.teams[1]?.players?.reduce((sum, p) => sum + p.skillLevel, 0) / (match.teams[1]?.players?.length || 1)).toFixed(1)} ★
+                        Formación: {match.teams[1]?.players?.filter(p => p.gender?.toLowerCase() === 'femenino').length}F / {match.teams[1]?.players?.length - match.teams[1]?.players?.filter(p => p.gender?.toLowerCase() === 'femenino').length}M
                       </span>
                     </div>
 
@@ -154,10 +156,12 @@ export default function UpcomingMatches({ matches, isAdmin, onUpdateMatchScore, 
                           />
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-semibold text-gray-200 truncate">{p.name}</p>
-                            <div className="flex gap-0.5 mt-0.5">
-                              {Array.from({ length: p.skillLevel }).map((_, i) => (
-                                <span key={i} className="text-brand-orange text-[9px]">★</span>
-                              ))}
+                            <div className="flex items-center gap-1.5 mt-1 font-mono text-[8px] font-bold">
+                              <span className={`px-1.5 py-0.2 rounded border uppercase ${
+                                p.gender?.toLowerCase() === 'femenino'
+                                  ? 'bg-brand-lime/10 text-brand-lime border-brand-lime/20'
+                                  : 'bg-brand-orange/10 text-brand-orange border-brand-orange/20'
+                              }`}>{p.gender === 'Femenino' ? 'FEM' : 'MASC'}</span>
                             </div>
                           </div>
                         </li>
@@ -182,7 +186,11 @@ export default function UpcomingMatches({ matches, isAdmin, onUpdateMatchScore, 
                             className="w-4.5 h-4.5 rounded-full object-cover bg-brand-slate cursor-zoom-in"
                           />
                           <span className="font-semibold text-[11px]">{p.name}</span>
-                          <span className="text-yellow-400 text-[9px] font-bold">({p.skillLevel}★)</span>
+                          <span className={`px-1.5 py-0.2 rounded border uppercase text-[8px] font-bold ${
+                            p.gender?.toLowerCase() === 'femenino'
+                              ? 'bg-brand-lime/10 text-brand-lime border-brand-lime/20'
+                              : 'bg-brand-orange/10 text-brand-orange border-brand-orange/20'
+                          }`}>{p.gender === 'Femenino' ? 'FEM' : 'MASC'}</span>
                         </div>
                       ))}
                     </div>

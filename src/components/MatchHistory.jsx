@@ -246,9 +246,11 @@ export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchSco
                               />
                               <span className="font-semibold">{p.name}</span>
                             </div>
-                            <span className="text-[10px] bg-brand-obsidian px-2 py-0.5 rounded-full text-brand-orange font-bold border border-brand-steel/45 font-mono">
-                              {p.skillLevel}★
-                            </span>
+                            <span className={`px-1.5 py-0.2 rounded border uppercase text-[8px] font-bold font-mono ${
+                              p.gender?.toLowerCase() === 'femenino'
+                                ? 'bg-brand-lime/10 text-brand-lime border-brand-lime/20'
+                                : 'bg-brand-orange/10 text-brand-orange border-brand-orange/20'
+                            }`}>{p.gender === 'Femenino' ? 'FEM' : 'MASC'}</span>
                           </li>
                         ))}
                       </ul>
@@ -275,9 +277,11 @@ export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchSco
                               />
                               <span className="font-semibold">{p.name}</span>
                             </div>
-                            <span className="text-[10px] bg-brand-obsidian px-2 py-0.5 rounded-full text-brand-orange font-bold border border-brand-steel/45 font-mono">
-                              {p.skillLevel}★
-                            </span>
+                            <span className={`px-1.5 py-0.2 rounded border uppercase text-[8px] font-bold font-mono ${
+                              p.gender?.toLowerCase() === 'femenino'
+                                ? 'bg-brand-lime/10 text-brand-lime border-brand-lime/20'
+                                : 'bg-brand-orange/10 text-brand-orange border-brand-orange/20'
+                            }`}>{p.gender === 'Femenino' ? 'FEM' : 'MASC'}</span>
                           </li>
                         ))}
                       </ul>
@@ -305,7 +309,11 @@ export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchSco
                                 onError={(e) => { e.target.src = 'https://api.dicebear.com/7.x/adventurer/svg?seed=fallback' }}
                               />
                               <span className="font-semibold">{p.name}</span>
-                              <span className="text-[10px] text-yellow-400 font-bold">({p.skillLevel}★)</span>
+                              <span className={`px-1.5 py-0.2 rounded border uppercase text-[8px] font-bold ${
+                                p.gender?.toLowerCase() === 'femenino'
+                                  ? 'bg-brand-lime/10 text-brand-lime border-brand-lime/20'
+                                  : 'bg-brand-orange/10 text-brand-orange border-brand-orange/20'
+                              }`}>{p.gender === 'Femenino' ? 'FEM' : 'MASC'}</span>
                             </div>
                           ))}
                         </div>
