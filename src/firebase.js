@@ -24,6 +24,7 @@ if (!USE_LOCAL_MOCK) {
     // Configurar Firestore con detección automática de Long-Polling para evitar ERR_QUIC_PROTOCOL_ERROR
     db = initializeFirestore(app, {
       experimentalAutoDetectLongPolling: true,
+      ignoreUndefinedProperties: true,
     });
     auth = getAuth(app);
     console.log("🔥 Firebase inicializado correctamente (Long Polling activo).");
