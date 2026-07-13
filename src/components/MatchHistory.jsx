@@ -3,33 +3,51 @@ import { Calendar, Clock, Trophy, Trash2, Award, CheckCircle, ChevronDown, Chevr
 
 export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchScore, onDeleteMatch, onViewAvatar }) {
   const [editingMatchId, setEditingMatchId] = useState(null);
-  const [score1, setScore1] = useState('');
-  const [score2, setScore2] = useState('');
+  const [winnerChoice, setWinnerChoice] = useState('');
   const [expandedMatchId, setExpandedMatchId] = useState(null);
 
   const handleStartEditScore = (match) => {
     setEditingMatchId(match.id);
-    setScore1(match.score?.team1 ?? '');
-    setScore2(match.score?.team2 ?? '');
+    const t1 = match.score?.team1;
+    const t2 = match.score?.team2;
+    if (t1 === null || t2 === null || t1 === undefined || t2 === undefined) {
+      setWinnerChoice('');
+    } else if (t1 > t2) {
+      setWinnerChoice('0');
+    } else if (t2 > t1) {
+      setWinnerChoice('1');
+    } else {
+      setWinnerChoice('-1');
+    }
   };
 
   const handleSaveScore = (matchId) => {
-    const s1 = parseInt(score1, 10);
-    const s2 = parseInt(score2, 10);
-    
-    if (isNaN(s1) || isNaN(s2)) {
-      alert("Por favor, ingresa puntuaciones válidas.");
+    if (!winnerChoice) {
+      alert("Por favor, selecciona un resultado.");
       return;
+    }
+    
+    const choice = parseInt(winnerChoice, 10);
+    let t1Val = 0;
+    let t2Val = 0;
+    if (choice === 0) {
+      t1Val = 1;
+      t2Val = 0;
+    } else if (choice === 1) {
+      t1Val = 0;
+      t2Val = 1;
+    } else if (choice === -1) {
+      t1Val = 0;
+      t2Val = 0;
     }
 
     onUpdateMatchScore(matchId, {
       status: 'finalizado',
-      score: { team1: s1, team2: s2 }
+      score: { team1: t1Val, team2: t2Val }
     });
 
     setEditingMatchId(null);
-    setScore1('');
-    setScore2('');
+    setWinnerChoice('');
   };
 
   const handleDelete = (matchId) => {
@@ -139,35 +157,43 @@ export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchSco
                         <Award className="w-2.5 h-2.5" /> Ganador
                       </span>
                     )}
+                    {hasWinner && winnerIndex === 1 && (
+                      <span className="text-[10px] text-gray-400 font-bold inline-flex items-center gap-0.5 mt-0.5 bg-gray-500/5 px-1.5 py-0.5 rounded border border-gray-500/10 font-mono">
+                        Perdedor
+                      </span>
+                    )}
+                    {hasWinner && winnerIndex === -1 && (
+                      <span className="text-[10px] text-yellow-500 font-bold inline-flex items-center gap-0.5 mt-0.5 bg-yellow-500/5 px-1.5 py-0.5 rounded border border-yellow-500/10 font-mono">
+                        Empate
+                      </span>
+                    )}
                   </div>
 
                   {/* Marcador Central */}
                   <div className="flex items-center justify-center gap-4 bg-brand-obsidian/40 px-6 py-3 rounded-2xl border border-brand-steel shadow-inner w-full md:w-auto">
                     {isEditing ? (
                       <div className="flex items-center gap-2 font-mono">
-                        <input
-                          type="number"
-                          min="0"
-                          value={score1}
-                          onChange={(e) => setScore1(e.target.value)}
-                          className="w-12 text-center bg-brand-slate border border-brand-steel focus:border-brand-orange outline-none text-lg font-black text-white rounded-lg py-1"
-                        />
-                        <span className="text-gray-500 font-bold">-</span>
-                        <input
-                          type="number"
-                          min="0"
-                          value={score2}
-                          onChange={(e) => setScore2(e.target.value)}
-                          className="w-12 text-center bg-brand-slate border border-brand-steel focus:border-brand-orange outline-none text-lg font-black text-white rounded-lg py-1"
-                        />
+                        <select
+                          value={winnerChoice}
+                          onChange={(e) => setWinnerChoice(e.target.value)}
+                          className="bg-brand-slate border border-brand-steel focus:border-brand-orange outline-none text-xs font-semibold text-white rounded-lg py-1.5 px-2.5 cursor-pointer"
+                        >
+                          <option value="">Seleccionar resultado</option>
+                          <option value="0">Ganador: Equipo 1</option>
+                          <option value="1">Ganador: Equipo 2</option>
+                          <option value="-1">Empate</option>
+                        </select>
                         <button
                           onClick={() => handleSaveScore(match.id)}
                           className="ml-2 px-3 py-1 bg-brand-orange hover:bg-brand-orange-dark text-white font-bold text-xs rounded transition-all cursor-pointer"
                         >
-                          Cargar
+                          Guardar
                         </button>
                         <button
-                          onClick={() => setEditingMatchId(null)}
+                          onClick={() => {
+                            setEditingMatchId(null);
+                            setWinnerChoice('');
+                          }}
                           className="px-2 py-1 bg-transparent border border-brand-steel hover:bg-white/5 text-gray-400 text-xs rounded transition-all cursor-pointer"
                         >
                           X
@@ -182,22 +208,18 @@ export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchSco
                               onClick={() => handleStartEditScore(match)}
                               className="px-4 py-1.5 bg-brand-orange hover:bg-brand-orange-dark text-white font-black text-xs rounded-lg transition-all shadow-md shadow-brand-orange/5 active:scale-95 cursor-pointer"
                             >
-                              Cargar Score
+                              Cargar Resultado
                             </button>
                           </div>
                         ) : (
                           <>
-                            <span className={`text-2xl font-black font-mono ${winnerIndex === 0 ? 'text-brand-orange font-extrabold' : 'text-gray-300'}`}>
-                              {t1Score}
-                            </span>
-                            <span className="text-gray-600 font-bold font-mono">vs</span>
-                            <span className={`text-2xl font-black font-mono ${winnerIndex === 1 ? 'text-brand-orange font-extrabold' : 'text-gray-300'}`}>
-                              {t2Score}
+                            <span className="text-xs text-gray-400 font-bold font-mono px-3 py-1 bg-brand-obsidian rounded-lg border border-brand-steel">
+                              Finalizado
                             </span>
                             <button
                               onClick={() => handleStartEditScore(match)}
                               className="p-1 text-gray-600 hover:text-brand-orange rounded transition-all cursor-pointer"
-                              title="Editar Score"
+                              title="Editar Resultado"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
@@ -215,6 +237,16 @@ export default function MatchHistory({ matches, sport, isAdmin, onUpdateMatchSco
                     {hasWinner && winnerIndex === 1 && (
                       <span className="text-[10px] text-brand-orange font-bold inline-flex items-center gap-0.5 mt-0.5 bg-brand-orange/5 px-1.5 py-0.5 rounded border border-brand-orange/10 font-mono">
                         <Award className="w-2.5 h-2.5" /> Ganador
+                      </span>
+                    )}
+                    {hasWinner && winnerIndex === 0 && (
+                      <span className="text-[10px] text-gray-400 font-bold inline-flex items-center gap-0.5 mt-0.5 bg-gray-500/5 px-1.5 py-0.5 rounded border border-gray-500/10 font-mono">
+                        Perdedor
+                      </span>
+                    )}
+                    {hasWinner && winnerIndex === -1 && (
+                      <span className="text-[10px] text-yellow-500 font-bold inline-flex items-center gap-0.5 mt-0.5 bg-yellow-500/5 px-1.5 py-0.5 rounded border border-yellow-500/10 font-mono">
+                        Empate
                       </span>
                     )}
                   </div>

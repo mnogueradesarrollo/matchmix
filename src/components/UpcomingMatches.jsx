@@ -3,8 +3,7 @@ import { Calendar, Clock, Award, Shield, CheckCircle, Edit2, Trash2, Users } fro
 
 export default function UpcomingMatches({ matches, isAdmin, onUpdateMatchScore, onDeleteMatch, onViewAvatar }) {
   const [editingMatchId, setEditingMatchId] = useState(null);
-  const [score1, setScore1] = useState('');
-  const [score2, setScore2] = useState('');
+  const [winnerChoice, setWinnerChoice] = useState('');
 
   const pendingMatches = matches.filter(m => m.status === 'pendiente');
 
@@ -12,25 +11,36 @@ export default function UpcomingMatches({ matches, isAdmin, onUpdateMatchScore, 
 
   const handleStartEditScore = (match) => {
     setEditingMatchId(match.id);
-    setScore1('');
-    setScore2('');
+    setWinnerChoice('');
   };
 
   const handleSaveScore = (matchId) => {
-    const s1 = parseInt(score1, 10);
-    const s2 = parseInt(score2, 10);
-    
-    if (isNaN(s1) || isNaN(s2)) {
-      alert("Por favor, ingresa puntuaciones válidas.");
+    if (!winnerChoice) {
+      alert("Por favor, selecciona un resultado.");
       return;
+    }
+    
+    const choice = parseInt(winnerChoice, 10);
+    let t1Val = 0;
+    let t2Val = 0;
+    if (choice === 0) {
+      t1Val = 1;
+      t2Val = 0;
+    } else if (choice === 1) {
+      t1Val = 0;
+      t2Val = 1;
+    } else if (choice === -1) {
+      t1Val = 0;
+      t2Val = 0;
     }
 
     onUpdateMatchScore(matchId, {
       status: 'finalizado',
-      score: { team1: s1, team2: s2 }
+      score: { team1: t1Val, team2: t2Val }
     });
 
     setEditingMatchId(null);
+    setWinnerChoice('');
   };
 
   const formatDate = (dateStr) => {
@@ -201,23 +211,16 @@ export default function UpcomingMatches({ matches, isAdmin, onUpdateMatchScore, 
                 <div className="mt-6 pt-4 border-t border-brand-steel/40 flex items-center justify-center">
                   {isEditing ? (
                     <div className="flex items-center gap-3 bg-brand-obsidian/50 px-4 py-2 rounded-xl border border-brand-steel font-mono">
-                      <input
-                        type="number"
-                        min="0"
-                        placeholder="E1"
-                        value={score1}
-                        onChange={(e) => setScore1(e.target.value)}
-                        className="w-12 text-center bg-brand-slate border border-brand-steel focus:border-brand-orange outline-none text-sm font-black text-white rounded-lg py-1"
-                      />
-                      <span className="text-gray-500 font-bold">-</span>
-                      <input
-                        type="number"
-                        min="0"
-                        placeholder="E2"
-                        value={score2}
-                        onChange={(e) => setScore2(e.target.value)}
-                        className="w-12 text-center bg-brand-slate border border-brand-steel focus:border-brand-orange outline-none text-sm font-black text-white rounded-lg py-1"
-                      />
+                      <select
+                        value={winnerChoice}
+                        onChange={(e) => setWinnerChoice(e.target.value)}
+                        className="bg-brand-slate border border-brand-steel focus:border-brand-orange outline-none text-xs font-semibold text-white rounded-lg py-1.5 px-2.5 cursor-pointer"
+                      >
+                        <option value="">Seleccionar resultado</option>
+                        <option value="0">Ganador: Equipo 1</option>
+                        <option value="1">Ganador: Equipo 2</option>
+                        <option value="-1">Empate</option>
+                      </select>
                       <button
                         onClick={() => handleSaveScore(match.id)}
                         className="ml-1 px-3 py-1 bg-brand-orange hover:bg-brand-orange-dark text-white font-bold text-xs rounded transition-all cursor-pointer"
@@ -225,7 +228,10 @@ export default function UpcomingMatches({ matches, isAdmin, onUpdateMatchScore, 
                         Guardar
                       </button>
                       <button
-                        onClick={() => setEditingMatchId(null)}
+                        onClick={() => {
+                          setEditingMatchId(null);
+                          setWinnerChoice('');
+                        }}
                         className="px-2.5 py-1 bg-transparent border border-brand-steel hover:bg-white/5 text-gray-400 text-xs rounded transition-all cursor-pointer"
                       >
                         X
