@@ -247,6 +247,7 @@ export default function App() {
             {/* Cartelera de Partidos (Pendientes) */}
             <UpcomingMatches
               matches={matches}
+              players={players}
               isAdmin={isAdmin}
               onUpdateMatchScore={handleUpdateMatchScore}
               onDeleteMatch={handleDeleteMatch}
