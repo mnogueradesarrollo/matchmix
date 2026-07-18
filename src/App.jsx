@@ -10,9 +10,21 @@ import { Sparkles, Trophy, Users, ShieldAlert, Cpu, X } from 'lucide-react';
 import { USE_LOCAL_MOCK, auth } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 
+const normalizeString = (str) => {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // elimina acentos
+    .replace(/[^a-z0-9]/g, "-")      // reemplaza caracteres no alfanuméricos por guiones
+    .replace(/-+/g, "-")             // colapsa guiones múltiples
+    .replace(/^-|-$/g, "");          // elimina guiones al inicio o final
+};
+
 export default function App() {
   const [sports, setSports] = useState([]);
   const [selectedSportId, setSelectedSportId] = useState('');
+  const [isLockedByUrl, setIsLockedByUrl] = useState(false);
   const [players, setPlayers] = useState([]);
   const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
   const [matches, setMatches] = useState([]);
@@ -50,6 +62,24 @@ export default function App() {
     const initSports = async () => {
       const loadedSports = await dbService.getSports();
       setSports(loadedSports);
+      
+      // Chequear parámetros de URL para bloquear grupo
+      const params = new URLSearchParams(window.location.search);
+      const targetGroup = params.get('grupo') || params.get('sport');
+      
+      if (targetGroup && loadedSports.length > 0) {
+        const normalizedTarget = normalizeString(targetGroup);
+        const found = loadedSports.find(s => 
+          normalizeString(s.id) === normalizedTarget ||
+          normalizeString(s.name) === normalizedTarget
+        );
+        if (found) {
+          setSelectedSportId(found.id);
+          setIsLockedByUrl(true);
+          return;
+        }
+      }
+
       if (loadedSports.length > 0) {
         setSelectedSportId(loadedSports[0].id);
       }
@@ -240,6 +270,7 @@ export default function App() {
           onUpdateSport={handleUpdateSport}
           isAdmin={isAdmin}
           onDeleteSport={handleDeleteSport}
+          isLockedByUrl={isLockedByUrl}
         />
 
         {selectedSport && (

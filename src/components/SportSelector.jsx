@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Plus, Trophy, Users, Trash2, Edit2 } from 'lucide-react';
+import { Plus, Trophy, Users, Trash2, Edit2, Lock } from 'lucide-react';
 
-export default function SportSelector({ sports, selectedSportId, onSelectSport, onAddSport, onUpdateSport, isAdmin, onDeleteSport }) {
+export default function SportSelector({ sports, selectedSportId, onSelectSport, onAddSport, onUpdateSport, isAdmin, onDeleteSport, isLockedByUrl }) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [newSportName, setNewSportName] = useState('');
@@ -62,12 +62,60 @@ export default function SportSelector({ sports, selectedSportId, onSelectSport, 
     }
   };
 
+  if (isLockedByUrl && !isAdmin) {
+    return (
+      <div className="w-full max-w-md mx-auto mb-6 px-4">
+        <div className="bg-brand-slate p-4 rounded-xl border border-brand-steel shadow-lg shadow-black/30 flex items-center justify-between gap-3">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-orange opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-orange"></span>
+              </span>
+              <span className="text-[10px] font-bold tracking-widest text-brand-orange uppercase font-mono">
+                Grupo Activo
+              </span>
+            </div>
+            <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2 font-display">
+              {selectedSport ? selectedSport.name : 'Deporte Seleccionado'}
+            </h2>
+          </div>
+          <div className="flex items-center gap-1 bg-brand-obsidian border border-brand-steel px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-400 font-mono">
+            <Lock className="w-3.5 h-3.5 text-brand-orange" />
+            Enlace Protegido
+          </div>
+        </div>
+
+        {/* Info Card */}
+        {selectedSport && (
+          <div className="mt-2 text-xs text-gray-400 flex items-center justify-between px-2 font-mono">
+            <span className="flex items-center gap-1">
+              <Users className="w-3 h-3 text-brand-orange" /> {selectedSport.playersPerTeam} jugadores por equipo
+            </span>
+            {selectedSport.specialPositions && selectedSport.specialPositions.length > 0 && (
+              <span className="bg-brand-lime/10 text-brand-lime px-2 py-0.5 rounded-full border border-brand-lime/20 font-bold">
+                Posición especial: {selectedSport.specialPositions.join(', ')}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-md mx-auto mb-6 px-4">
       <div className="flex items-center justify-between gap-3 bg-brand-slate p-4 rounded-xl border border-brand-steel shadow-lg shadow-black/30">
         <div className="flex-1">
-          <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5 font-mono">
-            <Trophy className="w-3.5 h-3.5 text-brand-orange" /> Seleccionar Deporte
+          <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 flex items-center justify-between gap-1.5 font-mono">
+            <span className="flex items-center gap-1.5">
+              <Trophy className="w-3.5 h-3.5 text-brand-orange" /> Seleccionar Deporte
+            </span>
+            {isLockedByUrl && (
+              <span className="text-[9px] text-brand-orange flex items-center gap-1 bg-brand-orange/10 px-2 py-0.5 rounded border border-brand-orange/20 font-bold animate-pulse">
+                <Lock className="w-2.5 h-2.5" /> Enlace Bloqueado (Admin Mode)
+              </span>
+            )}
           </label>
           
           <div className="flex gap-2">
